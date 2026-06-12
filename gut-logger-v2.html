@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>腸の記録 — パターンを見る</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Noto+Sans+JP:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap');
+
+  :root {
+    --bg: #08090f;
+    --surface: #0f1018;
+    --surface2: #14151f;
+    --border: #1c1e2e;
+    --border2: #252838;
+    --text: #e2e8f5;
+    --text2: #7c8db0;
+    --text3: #3a4260;
+    --signal: #f59e0b;
+    --signal-glow: rgba(245,158,11,0.12);
+    --good: #34d399;
+    --bad: #f87171;
+    --pending: #60a5fa;
+    --hit: #f59e0b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+  .app { max-width: 500px; margin: 0 auto; padding: 0 16px 80px; }
+
+  /* header */
+  .top {
+    padding: 24px 4px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+  }
+  .top-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem; font-weight: 400;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pulse {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--signal); box-shadow: 0 0 10px var(--signal);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
+  .top-role {
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3);
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: 20px;
+  }
+
+  /* tabs */
+  .tabs {
+    display: flex; gap: 4px; padding: 12px 0 0;
+    border-bottom: 1px solid var(--border); margin-bottom: 20px;
+  }
+  .tab {
+    padding: 7px 14px; border-radius: 7px 7px 0 0;
+    border: 1px solid transparent;
+    font-size: 12px; font-family: 'DM Mono', monospace;
+    color: var(--text3); cursor: pointer; transition: all 0.2s;
+    background: transparent;
+  }
+  .tab.active {
+    border-color: var(--border2); border-bottom-color: var(--bg);
+    color: var(--text); background: var(--bg);
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* capture btn */
+  .capture-btn {
+    width: 100%; padding: 22px;
+    border-radius: 16px; border: 1px solid var(--border2);
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
+    cursor: pointer; transition: all 0.25s;
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 20px;
+  }
+  .capture-btn:hover { border-color: var(--signal); box-shadow: 0 0 24px var(--signal-glow); }
+  .cap-emoji { font-size: 2rem; }
+  .cap-text { font-family: 'Noto Serif JP', serif; font-size: 1rem; }
+  .cap-hint { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* log list */
+  .log-card {
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px;
+    background: var(--surface); transition: border 0.2s;
+  }
+  .log-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .log-feel { font-size: 1.4rem; }
+  .log-meta { flex: 1; }
+  .log-context { font-size: 13px; color: var(--text); margin-bottom: 2px; }
+  .log-time { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); }
+  .log-note { font-size: 12px; color: var(--text2); padding: 8px 0 4px; border-top: 1px solid var(--border); margin-top: 6px; font-style: italic; line-height: 1.6; }
+  .result-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .result-label { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--text3); }
+  .result-btn {
+    padding: 4px 12px; border-radius: 14px; border: 1px solid var(--border);
+    background: transparent; font-size: 11px; cursor: pointer; transition: all 0.18s; color: var(--text3);
+  }
+  .result-btn.good:hover, .result-btn.good.active { border-color: var(--good); color: var(--good); background: rgba(52,211,153,0.1); }
+  .result-btn.bad:hover, .result-btn.bad.active { border-color: var(--bad); color: var(--bad); background: rgba(248,113,113,0.1); }
+  .result-badge { font-size: 10px; font-family: 'DM Mono', monospace; padding: 3px 9px; border-radius: 12px; margin-left: auto; }
+  .result-badge.pending { color: var(--pending); background: rgba(96,165,250,0.1); }
+  .result-badge.confirmed { color: var(--good); background: rgba(52,211,153,0.1); }
+  .result-badge.missed { color: var(--bad); background: rgba(248,113,113,0.1); }
+
+  /* ── PATTERN TAB ── */
+  .pattern-section { margin-bottom: 28px; }
+  .pat-title {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 14px;
+  }
+
+  /* heatmap grid */
+  .heatmap-wrap { overflow-x: auto; }
+  .heatmap {
+    display: grid;
+    gap: 4px;
+    min-width: 360px;
+  }
+  .hm-cell {
+    border-radius: 6px; padding: 8px 6px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 3px; cursor: pointer; transition: all 0.2s;
+    min-height: 52px; position: relative;
+  }
+  .hm-cell:hover { filter: brightness(1.3); transform: scale(1.04); }
+  .hm-emoji { font-size: 1.1rem; }
+  .hm-count { font-family: 'DM Mono', monospace; font-size: 10px; }
+  .hm-rate { font-size: 9px; font-family: 'DM Mono', monospace; }
+  .hm-header {
+    font-size: 10px; color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px; text-align: center; line-height: 1.3;
+  }
+  .hm-row-label {
+    font-size: 11px; color: var(--text2);
+    display: flex; align-items: center;
+    padding: 4px 8px; line-height: 1.3;
+  }
+
+  /* insight cards */
+  .insight-card {
+    border: 1px solid var(--border2); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 10px;
+    background: var(--surface);
+  }
+  .insight-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .insight-emoji { font-size: 1.3rem; }
+  .insight-head { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .insight-sub { font-size: 12px; color: var(--text2); line-height: 1.7; margin-top: 4px; }
+  .insight-bar { height: 3px; border-radius: 2px; margin-top: 10px; background: var(--border); }
+  .insight-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+
+  /* accuracy ring */
+  .accuracy-row { display: flex; gap: 12px; margin-bottom: 20px; }
+  .acc-card {
+    flex: 1; border: 1px solid var(--border2); border-radius: 12px;
+    padding: 14px; background: var(--surface); text-align: center;
+  }
+  .acc-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.8rem; font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .acc-label { font-size: 11px; color: var(--text3); }
+
+  /* modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5,6,10,0.85);
+    backdrop-filter: blur(8px);
+    display: none; align-items: flex-end; justify-content: center; z-index: 100;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    width: 100%; max-width: 500px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 24px 24px 0 0;
+    padding: 20px 18px 32px;
+    max-height: 88vh; overflow-y: auto;
+    animation: slideUp 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .modal-handle {
+    width: 36px; height: 4px; background: var(--border2);
+    border-radius: 2px; margin: 0 auto 18px;
+  }
+  .step-ind { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--text3); margin-bottom: 6px; }
+  .step-q { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; margin-bottom: 18px; line-height: 1.5; }
+  .feel-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+  .feel-btn {
+    aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--surface2); cursor: pointer; transition: all 0.18s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 6px;
+  }
+  .feel-btn .fe { font-size: 1.4rem; }
+  .feel-btn .fl { font-size: 9px; color: var(--text3); text-align: center; }
+  .feel-btn:hover { border-color: var(--signal); transform: scale(1.04); }
+  .feel-btn.selected { border-color: var(--signal); background: var(--signal-glow); }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    padding: 9px 14px; border-radius: 22px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text2); font-size: 12px; cursor: pointer; transition: all 0.18s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--border2); }
+  .chip.selected { border-color: var(--signal); background: var(--signal-glow); color: var(--signal); }
+  .note-input {
+    width: 100%; padding: 12px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    font-weight: 300; resize: none; transition: border 0.2s;
+  }
+  .note-input:focus { outline: none; border-color: var(--signal); }
+  .note-input::placeholder { color: var(--text3); }
+  .note-hint { font-size: 11px; color: var(--text3); margin-top: 6px; text-align: center; }
+  .modal-nav { display: flex; gap: 8px; margin-top: 20px; }
+  .mbtn {
+    flex: 1; padding: 13px; border-radius: 10px;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+    border: 1px solid var(--border2); background: transparent; color: var(--text2);
+  }
+  .mbtn.primary {
+    background: var(--signal); border-color: var(--signal);
+    color: #1a1206; font-weight: 500;
+  }
+  .mbtn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--signal); color: #1a1206;
+    padding: 11px 22px; border-radius: 22px;
+    font-size: 13px; font-weight: 500; opacity: 0;
+    transition: all 0.3s; z-index: 200;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .empty { text-align: center; padding: 36px 16px; color: var(--text3); font-size: 13px; line-height: 1.8; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top">
+    <div class="top-title"><span class="pulse"></span>腸の記録</div>
+    <div class="top-role">担当：品質 / Mizuna</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('log')">記録</button>
+    <button class="tab" onclick="switchTab('pattern')">パターン</button>
+  </div>
+
+  <!-- LOG TAB -->
+  <div class="panel active" id="tab-log">
+    <button class="capture-btn" onclick="openModal()">
+      <span class="cap-emoji">🫀</span>
+      <div>
+        <div class="cap-text">いま「なんか」あった</div>
+        <div class="cap-hint">3タップで残す・書かなくていい</div>
+      </div>
+    </button>
+    <div id="logList"></div>
+  </div>
+
+  <!-- PATTERN TAB -->
+  <div class="panel" id="tab-pattern">
+
+    <!-- accuracy summary -->
+    <div class="accuracy-row" id="accRow"></div>
+
+    <!-- heatmap -->
+    <div class="pattern-section">
+      <div class="pat-title">// 文脈 × 感覚 マトリクス</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.7">
+        色が濃いほど記録が多い。数字は「当たり率」。自分の腸が敏感な組み合わせが見える。
+      </div>
+      <div class="heatmap-wrap">
+        <div class="heatmap" id="heatmap"></div>
+      </div>
+    </div>
+
+    <!-- insights -->
+    <div class="pattern-section">
+      <div class="pat-title">// 腸のクセ — 上位パターン</div>
+      <div id="insightList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="mstep1">
+      <div class="step-ind">Step 1 / 3 ・ 反射でいい</div>
+      <div class="step-q">どんな感覚でしたか？</div>
+      <div class="feel-grid" id="feelGrid"></div>
+      <div class="modal-nav">
+        <button class="mbtn" onclick="closeModal()">やめる</button>
+        <button class="mbtn primary" id="next1" disabled onclick="modalStep(2)">次へ</button>
+      </div>
+    </div>
+    <div id="mstep2" style="display:none">
+      <div class="step-ind">Step 2 / 3 ・ どこで？</div>
+      <div class="step-q">何の場面でしたか？</div>
+      <div class="chip-row" id="contextChips"></div>
+      <div class="modal-nav">
+        <button class="mbtn" onclick="modalStep(1)">もどる</button>
+        <button class="mbtn primary" id="next2" disabled onclick="modalStep(3)">次へ</button>
+      </div>
+    </div>
+    <div id="mstep3" style="display:none">
+      <div class="step-ind">Step 3 / 4 ・ ふとした瞬間</div>
+      <div class="step-q" id="langQ">もう少しだけ、教えてください</div>
+      <div class="chip-row" id="langChips"></div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text3);text-align:center">選ばなくてもOK</div>
+      <div class="modal-nav">
+        <button class="mbtn" onclick="modalStep(2)">もどる</button>
+        <button class="mbtn primary" onclick="modalStep(4)">次へ</button>
+      </div>
+    </div>
+    <div id="mstep4" style="display:none">
+      <div class="step-ind">Step 4 / 4 ・ 任意</div>
+      <div class="step-q">一言だけ、あれば</div>
+      <textarea class="note-input" id="noteInput" rows="3" placeholder="「なんか嫌な予感」「いつもと違う」… 空欄でもOK"></textarea>
+      <div class="note-hint">腸は言葉にならなくていい</div>
+      <div class="modal-nav">
+        <button class="mbtn" onclick="modalStep(3)">もどる</button>
+        <button class="mbtn primary" onclick="saveLog()">記録する</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">腸に刻みました 🫀</div>
+
+<script>
+const FEELINGS = [
+  {e:'⚡',label:'ざわっと'},{e:'🌀',label:'モヤッと'},
+  {e:'🌧️',label:'重い'},{e:'😶',label:'違和感'},
+  {e:'🔥',label:'熱く'},{e:'✨',label:'ピンと'},
+  {e:'🧊',label:'ヒヤッと'},{e:'❓',label:'なんとなく'},
+];
+const CONTEXTS = [
+  'サプライヤー訪問','不良の現物','データを見てて',
+  '会議中','現場で','メールのやりとり',
+  '若手との対話','帰り道','なんとなく'
+];
+
+let draft = {feel:null,context:null,langChoice:null,note:''};
+
+// ── 言語化サポート質問 ──
+const LANG_QUESTIONS = {
+  'ざわっと': { q:'そのざわつき、どこから来てる感じですか？', choices:['相手の言葉','相手の態度','数字や情報','場の空気','わからない'] },
+  'モヤッと': { q:'そのモヤモヤ、いつ頃からですか？', choices:['今日突然','少し前から','ずっと前から','気づいたらあった','わからない'] },
+  '重い':     { q:'重さは、体のどこにありますか？', choices:['胸のあたり','肩・首','お腹の奥','全体的に','うまく言えない'] },
+  '違和感':   { q:'いつもと何が違う感じですか？', choices:['言葉のトーン','動きや態度','データや数字','雰囲気・空気','うまく言えない'] },
+  '熱く':     { q:'その熱さは、どちらに向かっていますか？', choices:['前に進みたい','守りたいものがある','誰かのために','自分自身へ','わからない'] },
+  'ピンと':   { q:'そのピンと来た感覚、信頼できそうですか？', choices:['かなり信頼できる','たぶん合ってる','まだ確信がない','根拠はないけど','わからない'] },
+  'ヒヤッと': { q:'そのヒヤッと、何を察知した感じですか？', choices:['リスクの予感','隠れてる何か','過去と似た何か','タイミングのズレ','うまく言えない'] },
+  'なんとなく':{ q:'「なんとなく」、強いて言うなら？', choices:['いい予感','悪い予感','変化の予感','何かが引っかかる','ほんとにわからない'] },
+};
+
+// ── seed data (30件・パターンが見えるように) ──
+const now = Date.now();
+const D = (d,h) => new Date(now - d*86400000 - h*3600000);
+let logs = [
+  {id:1,feel:{e:'🧊',label:'ヒヤッと'},context:'サプライヤー訪問',note:'担当者の説明が速すぎた',time:D(28,2),result:'confirmed'},
+  {id:2,feel:{e:'😶',label:'違和感'},context:'サプライヤー訪問',note:'目を合わせない瞬間があった',time:D(25,3),result:'confirmed'},
+  {id:3,feel:{e:'🧊',label:'ヒヤッと'},context:'サプライヤー訪問',note:'',time:D(22,1),result:'confirmed'},
+  {id:4,feel:{e:'🌀',label:'モヤッと'},context:'サプライヤー訪問',note:'資料の数字が丸すぎる',time:D(18,4),result:'confirmed'},
+  {id:5,feel:{e:'😶',label:'違和感'},context:'サプライヤー訪問',note:'',time:D(14,2),result:'missed'},
+  {id:6,feel:{e:'🧊',label:'ヒヤッと'},context:'サプライヤー訪問',note:'いつもより人が少ない',time:D(10,3),result:'confirmed'},
+  {id:7,feel:{e:'⚡',label:'ざわっと'},context:'データを見てて',note:'Cpkが微妙に下がってる',time:D(26,5),result:'confirmed'},
+  {id:8,feel:{e:'⚡',label:'ざわっと'},context:'データを見てて',note:'',time:D(20,2),result:'confirmed'},
+  {id:9,feel:{e:'🌀',label:'モヤッと'},context:'データを見てて',note:'ロット間でばらつきがある',time:D(15,1),result:'confirmed'},
+  {id:10,feel:{e:'⚡',label:'ざわっと'},context:'データを見てて',note:'',time:D(8,3),result:'pending'},
+  {id:11,feel:{e:'😶',label:'違和感'},context:'データを見てて',note:'',time:D(3,2),result:'pending'},
+  {id:12,feel:{e:'✨',label:'ピンと'},context:'会議中',note:'この方向性、合ってると思った',time:D(24,6),result:'confirmed'},
+  {id:13,feel:{e:'🌀',label:'モヤッと'},context:'会議中',note:'',time:D(19,3),result:'missed'},
+  {id:14,feel:{e:'⚡',label:'ざわっと'},context:'会議中',note:'',time:D(12,1),result:'pending'},
+  {id:15,feel:{e:'😶',label:'違和感'},context:'不良の現物',note:'外観は問題ないが何かが',time:D(27,2),result:'confirmed'},
+  {id:16,feel:{e:'🧊',label:'ヒヤッと'},context:'不良の現物',note:'',time:D(21,4),result:'confirmed'},
+  {id:17,feel:{e:'🌀',label:'モヤッと'},context:'不良の現物',note:'再発のパターンに似てる',time:D(16,1),result:'confirmed'},
+  {id:18,feel:{e:'😶',label:'違和感'},context:'不良の現物',note:'',time:D(9,3),result:'pending'},
+  {id:19,feel:{e:'✨',label:'ピンと'},context:'若手との対話',note:'この子、伸びる気がした',time:D(23,5),result:'confirmed'},
+  {id:20,feel:{e:'🌀',label:'モヤッと'},context:'若手との対話',note:'何か抱えてる感じがした',time:D(17,2),result:'confirmed'},
+  {id:21,feel:{e:'✨',label:'ピンと'},context:'若手との対話',note:'',time:D(11,4),result:'pending'},
+  {id:22,feel:{e:'🔥',label:'熱く'},context:'若手との対話',note:'本気で悩んでた',time:D(5,1),result:'pending'},
+  {id:23,feel:{e:'🌀',label:'モヤッと'},context:'帰り道',note:'',time:D(29,7),result:'missed'},
+  {id:24,feel:{e:'🧊',label:'ヒヤッと'},context:'帰り道',note:'今日の訪問、何かおかしかった',time:D(13,8),result:'confirmed'},
+  {id:25,feel:{e:'❓',label:'なんとなく'},context:'なんとなく',note:'',time:D(7,2),result:'pending'},
+  {id:26,feel:{e:'⚡',label:'ざわっと'},context:'メールのやりとり',note:'返信が遅い',time:D(6,3),result:'pending'},
+  {id:27,feel:{e:'😶',label:'違和感'},context:'メールのやりとり',note:'',time:D(4,1),result:'missed'},
+  {id:28,feel:{e:'🌀',label:'モヤッと'},context:'現場で',note:'',time:D(2,5),result:'pending'},
+  {id:29,feel:{e:'🧊',label:'ヒヤッと'},context:'サプライヤー訪問',note:'今日も何かある',time:D(1,2),result:'pending'},
+  {id:30,feel:{e:'⚡',label:'ざわっと'},context:'データを見てて',note:'',time:D(0,4),result:'pending'},
+];
+let nextId = 31;
+
+// ── utils ──
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='pattern') renderPattern();
+}
+function fmtTime(d) {
+  const days=['日','月','火','水','木','金','土'];
+  return `${d.getMonth()+1}/${d.getDate()}(${days[d.getDay()]}) ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ── modal ──
+function openModal() {
+  draft={feel:null,context:null,note:''};
+  document.getElementById('feelGrid').innerHTML='';
+  FEELINGS.forEach(f=>{
+    const btn=document.createElement('button');
+    btn.className='feel-btn';
+    btn.innerHTML=`<span class="fe">${f.e}</span><span class="fl">${f.label}</span>`;
+    btn.onclick=()=>{
+      document.querySelectorAll('.feel-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected'); draft.feel=f;
+      document.getElementById('next1').disabled=false;
+    };
+    document.getElementById('feelGrid').appendChild(btn);
+  });
+  document.getElementById('contextChips').innerHTML='';
+  CONTEXTS.forEach(c=>{
+    const chip=document.createElement('button');
+    chip.className='chip'; chip.textContent=c;
+    chip.onclick=()=>{
+      document.querySelectorAll('.chip').forEach(b=>b.classList.remove('selected'));
+      chip.classList.add('selected'); draft.context=c;
+      document.getElementById('next2').disabled=false;
+    };
+    document.getElementById('contextChips').appendChild(chip);
+  });
+  document.getElementById('noteInput').value='';
+  document.getElementById('next1').disabled=true;
+  document.getElementById('next2').disabled=true;
+  modalStep(1);
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
+function modalStep(n){
+  [1,2,3,4].forEach(i=>{
+    const el=document.getElementById('mstep'+i);
+    if(el) el.style.display=i===n?'block':'none';
+  });
+  // build lang chips when entering step 3
+  if(n===3 && draft.feel){
+    const langData = LANG_QUESTIONS[draft.feel.label];
+    if(langData){
+      document.getElementById('langQ').textContent = langData.q;
+      const chips = document.getElementById('langChips');
+      chips.innerHTML='';
+      draft.langChoice=null;
+      langData.choices.forEach(c=>{
+        const chip=document.createElement('button');
+        chip.className='chip'; chip.textContent=c;
+        chip.onclick=()=>{
+          document.querySelectorAll('#langChips .chip').forEach(b=>b.classList.remove('selected'));
+          chip.classList.add('selected'); draft.langChoice=c;
+        };
+        chips.appendChild(chip);
+      });
+    }
+  }
+}
+function saveLog(){
+  draft.note=document.getElementById('noteInput').value.trim();
+  const noteWithLang = draft.langChoice && !draft.note ? draft.langChoice : draft.note ? (draft.langChoice ? `[${draft.langChoice}] ${draft.note}` : draft.note) : '';
+  logs.unshift({id:nextId++,feel:draft.feel,context:draft.context,note:noteWithLang,time:new Date(),result:'pending'});
+  closeModal(); renderLogs(); showToast();
+}
+function showToast(){
+  const t=document.getElementById('toast');
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800);
+}
+function setResult(id,result){
+  const log=logs.find(l=>l.id===id);
+  if(log){ log.result=log.result===result?'pending':result; renderLogs(); }
+}
+
+// ── log render ──
+function renderLogs(){
+  const list=document.getElementById('logList');
+  if(!logs.length){ list.innerHTML=`<div class="empty">まだ記録がありません。<br>「なんか」を感じたら押してください。</div>`; return; }
+  const badge={pending:'<span class="result-badge pending">結果まち</span>',confirmed:'<span class="result-badge confirmed">当たった</span>',missed:'<span class="result-badge missed">外れた</span>'};
+  list.innerHTML='';
+  logs.slice(0,15).forEach(log=>{
+    const card=document.createElement('div');
+    card.className='log-card';
+    card.innerHTML=`
+      <div class="log-card-top">
+        <span class="log-feel">${log.feel.e}</span>
+        <div class="log-meta">
+          <div class="log-context">${log.feel.label}・${log.context}</div>
+          <div class="log-time">${fmtTime(log.time)}</div>
+        </div>
+        ${badge[log.result]}
+      </div>
+      ${log.note?`<div class="log-note">"${log.note}"</div>`:''}
+      <div class="result-row">
+        <span class="result-label">その予感は？</span>
+        <button class="result-btn good ${log.result==='confirmed'?'active':''}" onclick="setResult(${log.id},'confirmed')">当たった</button>
+        <button class="result-btn bad ${log.result==='missed'?'active':''}" onclick="setResult(${log.id},'missed')">外れた</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+// ── pattern render ──
+function renderPattern(){
+  const decided = logs.filter(l=>l.result!=='pending');
+  const confirmed = logs.filter(l=>l.result==='confirmed');
+  const total = logs.length;
+  const rate = decided.length ? Math.round(confirmed.length/decided.length*100) : 0;
+
+  // accuracy summary
+  document.getElementById('accRow').innerHTML=`
+    <div class="acc-card">
+      <div class="acc-num" style="color:var(--signal)">${total}</div>
+      <div class="acc-label">総記録数</div>
+    </div>
+    <div class="acc-card">
+      <div class="acc-num" style="color:var(--good)">${rate}%</div>
+      <div class="acc-label">腸の当たり率</div>
+    </div>
+    <div class="acc-card">
+      <div class="acc-num" style="color:var(--pending)">${logs.filter(l=>l.result==='pending').length}</div>
+      <div class="acc-label">結果まち</div>
+    </div>
+  `;
+
+  // heatmap: context × feeling
+  const usedContexts = [...new Set(logs.map(l=>l.context))].slice(0,6);
+  const usedFeelings = [...new Set(logs.map(l=>l.feel.label))].slice(0,5);
+  const cols = usedFeelings.length + 1;
+
+  const hm = document.getElementById('heatmap');
+  hm.style.gridTemplateColumns = `80px ${usedFeelings.map(()=>'1fr').join(' ')}`;
+  hm.innerHTML='';
+
+  // header row
+  hm.appendChild(Object.assign(document.createElement('div'),{className:'hm-header',textContent:''}));
+  usedFeelings.forEach(f=>{
+    const feel = FEELINGS.find(x=>x.label===f);
+    const div=document.createElement('div');
+    div.className='hm-header';
+    div.innerHTML=`${feel?feel.e:''}<br>${f}`;
+    hm.appendChild(div);
+  });
+
+  // data rows
+  usedContexts.forEach(ctx=>{
+    const rowLabel=document.createElement('div');
+    rowLabel.className='hm-row-label';
+    rowLabel.textContent=ctx.length>7?ctx.slice(0,7)+'…':ctx;
+    hm.appendChild(rowLabel);
+
+    usedFeelings.forEach(fl=>{
+      const cell_logs = logs.filter(l=>l.context===ctx&&l.feel.label===fl);
+      const cell_dec = cell_logs.filter(l=>l.result!=='pending');
+      const cell_hit = cell_logs.filter(l=>l.result==='confirmed');
+      const count = cell_logs.length;
+      const hitRate = cell_dec.length ? Math.round(cell_hit.length/cell_dec.length*100) : null;
+      const intensity = Math.min(count/5, 1);
+
+      const cell=document.createElement('div');
+      cell.className='hm-cell';
+      const alpha = 0.08 + intensity*0.55;
+      cell.style.background = count>0
+        ? `rgba(245,158,11,${alpha})`
+        : 'var(--surface2)';
+      cell.style.border = count>0
+        ? `1px solid rgba(245,158,11,${alpha*1.5})`
+        : '1px solid var(--border)';
+
+      if(count>0){
+        const feel=FEELINGS.find(x=>x.label===fl);
+        cell.innerHTML=`
+          <span class="hm-emoji">${feel?feel.e:''}</span>
+          <span class="hm-count" style="color:var(--signal)">${count}件</span>
+          ${hitRate!==null?`<span class="hm-rate" style="color:${hitRate>=70?'var(--good)':hitRate>=40?'var(--signal)':'var(--bad)'}">${hitRate}%</span>`:''}
+        `;
+      } else {
+        cell.innerHTML='<span style="color:var(--border2);font-size:10px">—</span>';
+      }
+      hm.appendChild(cell);
+    });
+  });
+
+  // insights
+  const combos=[];
+  usedContexts.forEach(ctx=>{
+    usedFeelings.forEach(fl=>{
+      const cl=logs.filter(l=>l.context===ctx&&l.feel.label===fl);
+      const cd=cl.filter(l=>l.result!=='pending');
+      const ch=cl.filter(l=>l.result==='confirmed');
+      if(cl.length>=2){
+        combos.push({
+          ctx, fl,
+          feel: FEELINGS.find(x=>x.label===fl),
+          count: cl.length,
+          hitRate: cd.length ? Math.round(ch.length/cd.length*100) : null,
+          decided: cd.length
+        });
+      }
+    });
+  });
+  combos.sort((a,b)=>b.count-a.count);
+
+  const insightEl=document.getElementById('insightList');
+  insightEl.innerHTML='';
+  if(!combos.length){
+    insightEl.innerHTML='<div class="empty">記録が増えるとパターンが見えてきます</div>';
+    return;
+  }
+
+  combos.slice(0,5).forEach(c=>{
+    const card=document.createElement('div');
+    card.className='insight-card';
+    const rateColor = c.hitRate===null?'var(--pending)':c.hitRate>=70?'var(--good)':c.hitRate>=40?'var(--signal)':'var(--bad)';
+    const rateText = c.hitRate===null?'結果まち多い':`当たり率 ${c.hitRate}%`;
+    const msg = c.hitRate>=70
+      ? 'この組み合わせ、腸が得意としている。次も信頼して動いていい。'
+      : c.hitRate!==null && c.hitRate<40
+      ? 'この組み合わせ、過剰反応かもしれない。一呼吸おいて確認を。'
+      : 'まだ結果が揃っていない。記録を続けて腸のクセを育てよう。';
+
+    card.innerHTML=`
+      <div class="insight-top">
+        <span class="insight-emoji">${c.feel?c.feel.e:''}</span>
+        <div>
+          <div class="insight-head">${c.ctx} × ${c.fl} <span style="color:var(--text3);font-size:11px">${c.count}件</span></div>
+          <div style="font-size:11px;color:${rateColor};margin-top:2px;font-family:'DM Mono',monospace">${rateText}</div>
+        </div>
+      </div>
+      <div class="insight-sub">${msg}</div>
+      ${c.hitRate!==null?`
+      <div class="insight-bar">
+        <div class="insight-bar-fill" style="width:${c.hitRate}%;background:${rateColor}"></div>
+      </div>`:''}
+    `;
+    insightEl.appendChild(card);
+  });
+}
+
+renderLogs();
+</script>
+</body>
+</html>

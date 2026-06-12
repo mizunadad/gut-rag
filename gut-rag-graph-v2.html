@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>腸で考えるRAG — 完全構造図</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Noto+Sans+JP:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap');
+
+  :root {
+    --bg: #07080e;
+    --surface: #0d0e18;
+    --surface2: #12141f;
+    --border: #1a1c2c;
+    --border2: #232640;
+    --text: #e2e8f5;
+    --text2: #7c8db0;
+    --text3: #3a4260;
+
+    --hannya:  #fbbf24;  /* 般若心経・空 */
+    --tetsugaku: #e879f9; /* 哲学・仏教統合 */
+    --l1: #818cf8;       /* Layer1 身体 */
+    --l2: #38bdf8;       /* Layer2 統合 */
+    --l3: #4ade80;       /* Layer3 意味 */
+    --kotoba: #fb7185;   /* 身体知10語 */
+    --sing:   #f97316;   /* Singularity */
+    --kiroku: #a78bfa;   /* 記録設計 */
+    --rag:    #e2e8f5;   /* RAG実装 */
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+  .app { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+
+  header { padding: 32px 8px 20px; }
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.25em;
+    color: var(--text3); text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 300; margin-bottom: 6px;
+  }
+  .sub { font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+  /* tabs */
+  .tabs {
+    display: flex; gap: 4px;
+    padding: 16px 0 0; margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    padding: 8px 16px; border-radius: 8px 8px 0 0;
+    border: 1px solid transparent;
+    font-size: 12px; font-family: 'DM Mono', monospace;
+    letter-spacing: 0.08em; color: var(--text3);
+    cursor: pointer; transition: all 0.2s;
+    background: transparent;
+  }
+  .tab:hover { color: var(--text2); }
+  .tab.active {
+    border-color: var(--border2);
+    border-bottom-color: var(--bg);
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  /* panels */
+  .panel { display: none; padding: 20px 0; }
+  .panel.active { display: block; }
+
+  /* legend */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  /* SVG */
+  svg { width:100%; display:block; }
+
+  /* detail card */
+  .detail-card {
+    border-radius: 14px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    padding: 18px 20px;
+    margin: 12px 0;
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+  .detail-card.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  .dc-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .dc-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .dc-title { font-family:'Noto Serif JP',serif; font-size:1.05rem; }
+  .dc-tag {
+    margin-left:auto;
+    font-family:'DM Mono',monospace; font-size:10px;
+    padding:3px 10px; border-radius:12px;
+    border:1px solid var(--border2); color:var(--text3);
+  }
+  .dc-desc { font-size:13px; color:var(--text2); line-height:1.85; margin-bottom:12px; }
+  .dc-sing {
+    font-size:12px; color:var(--sing);
+    border-left:2px solid var(--sing);
+    padding:8px 12px; margin-bottom:12px;
+    background:rgba(249,115,22,0.06);
+    border-radius:0 6px 6px 0;
+    line-height:1.8;
+  }
+  .dc-links { display:flex; flex-wrap:wrap; gap:6px; }
+  .dc-link {
+    font-size:11px; font-family:'DM Mono',monospace;
+    padding:4px 10px; border-radius:16px;
+    border:1px solid var(--border2); color:var(--text3);
+  }
+  .dc-link.req { border-color:rgba(251,191,36,0.4); color:#fbbf24; }
+  .dc-link.ena { border-color:rgba(74,222,128,0.4); color:#4ade80; }
+
+  /* flow */
+  .flow-step {
+    display:flex; gap:14px; padding:12px 10px;
+    border-radius:10px; cursor:pointer; transition:background 0.2s;
+  }
+  .flow-step:hover { background:var(--surface); }
+  .flow-line { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:20px; }
+  .flow-node { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .flow-connector { width:1px; flex:1; min-height:20px; background:var(--border2); margin:3px 0; }
+  .flow-content { flex:1; }
+  .flow-name { font-family:'Noto Serif JP',serif; font-size:0.95rem; margin-bottom:3px; }
+  .flow-sub { font-size:11px; color:var(--text3); line-height:1.6; }
+  .flow-badge {
+    font-family:'DM Mono',monospace; font-size:9px;
+    padding:2px 7px; border-radius:10px; margin-left:7px; vertical-align:middle;
+  }
+  .flow-badge.req { background:rgba(251,191,36,0.12); color:#fbbf24; }
+  .flow-badge.ena { background:rgba(74,222,128,0.12); color:#4ade80; }
+  .flow-badge.sing { background:rgba(249,115,22,0.12); color:var(--sing); }
+
+  /* singularity table */
+  .sing-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .sing-table th {
+    font-family:'DM Mono',monospace; font-size:10px;
+    letter-spacing:0.15em; text-transform:uppercase;
+    color:var(--text3); padding:10px 12px;
+    border-bottom:1px solid var(--border2); text-align:left;
+  }
+  .sing-table td {
+    padding:12px; border-bottom:1px solid var(--border);
+    color:var(--text2); vertical-align:top; line-height:1.7;
+  }
+  .sing-table tr:hover td { background:var(--surface); }
+  .sing-table .tech { color:var(--sing); font-family:'DM Mono',monospace; font-size:12px; }
+  .sing-table .wall { color:var(--kotoba); }
+  .badge-s { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-family:'DM Mono',monospace; }
+  .badge-near { background:rgba(74,222,128,0.12); color:#4ade80; }
+  .badge-mid  { background:rgba(251,191,36,0.12); color:#fbbf24; }
+  .badge-hard { background:rgba(248,113,113,0.12); color:#f87171; }
+
+  .node-g { cursor:pointer; }
+  .node-g:hover circle { filter:brightness(1.25); }
+  .node-g text { pointer-events:none; user-select:none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="eyebrow">Complete Knowledge Architecture v2</div>
+  <h1>腸で考えるRAG — 完全構造図</h1>
+  <div class="sub">般若心経 × 哲学 × 神経科学 × Singularity × RAG実装</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('graph')">関係図</button>
+  <button class="tab" onclick="switchTab('flow')">required/enables フロー</button>
+  <button class="tab" onclick="switchTab('sing')">Singularity 対比</button>
+</div>
+
+<!-- TAB 1: Graph -->
+<div class="panel active" id="tab-graph">
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:var(--hannya)"></div>般若心経・空</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--tetsugaku)"></div>哲学×仏教統合</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--l1)"></div>L1身体層</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--l2)"></div>L2統合層</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--l3)"></div>L3意味層</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--kotoba)"></div>身体知</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--sing)"></div>Singularity</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--kiroku)"></div>記録設計</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--rag)"></div>RAG実装</div>
+    <div class="leg">
+      <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4,2"/></svg>
+      required
+    </div>
+    <div class="leg">
+      <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#4ade80" stroke-width="1.5"/></svg>
+      enables
+    </div>
+  </div>
+  <svg id="graphSvg" viewBox="0 0 920 500" preserveAspectRatio="xMidYMid meet"></svg>
+  <div class="detail-card" id="detailCard"></div>
+</div>
+
+<!-- TAB 2: Flow -->
+<div class="panel" id="tab-flow">
+  <div id="flowSteps"></div>
+  <div class="detail-card" id="detailCard2"></div>
+</div>
+
+<!-- TAB 3: Singularity -->
+<div class="panel" id="tab-sing">
+  <div style="margin-bottom:16px; font-size:13px; color:var(--text2); line-height:1.8; padding:14px 16px; border:1px solid var(--border2); border-radius:10px; background:var(--surface);">
+    <span style="color:var(--sing); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.15em;">SINGULARITY × 身体知</span><br>
+    Singularityの技術は「AIにはLayer1がない」という壁に、どこまで迫れるか。
+    身体知の各要素と技術の対応を整理する。
+  </div>
+  <table class="sing-table">
+    <thead>
+      <tr>
+        <th>身体知の要素</th>
+        <th>対応するSingularity技術</th>
+        <th>突破度</th>
+        <th>残る壁</th>
+      </tr>
+    </thead>
+    <tbody id="singTable"></tbody>
+  </table>
+  <div style="margin-top:20px; padding:14px 16px; border:1px solid rgba(251,191,36,0.2); border-radius:10px; background:rgba(251,191,36,0.04); font-size:13px; color:var(--text2); line-height:1.8;">
+    <span style="color:var(--hannya); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em;">般若心経 × Singularity</span><br>
+    五蘊皆空「固定した自己はない」＝ DMNの動的パターン説。<br>
+    ワールドモデルも「モデル自体が空」——実体のない関係性の網。<br>
+    Singularityが到達しても、<strong style="color:var(--text)">「それを経験している主体」の問い</strong>は消えない。チャーマーズの意識のハード問題として残り続ける。
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ── Node data ──
+const NODES = [
+  {
+    id:'hannya', label:['般若心経','色即是空','五蘊皆空'], color:'var(--hannya)', x:100, y:80, r:38,
+    tag:'根本思想',
+    desc:'「色即是空、空即是色」。五蘊（色・受・想・行・識）はすべて固定した実体を持たない。認識・身体・意識は関係性の動的パターンであり、GraphRAGのノードに実体がなくエッジだけが存在する構造と同型。',
+    sing:'「モデル自体が空」——ワールドモデルも固定した世界表現ではなく動的パターン。Singularityが到達しても「体験する主体」の問いは消えない。',
+    required:[], enables:['tetsugaku','nou3','kotoba']
+  },
+  {
+    id:'tetsugaku', label:['哲学×仏教','メルロ=ポンティ','フランクル・龍樹'], color:'var(--tetsugaku)', x:300, y:55, r:40,
+    tag:'統合思想',
+    desc:'メルロ＝ポンティ「身体が世界への入口、身体なき知覚は知覚ではない」。フランクル「論証不要の意味の感知」。龍樹の中論「空の哲学」。ハイデガー「現存在」。唯識論「認識は心が作る」。仏教と哲学は分けられない——同じ筋が東西で独立に発見された。',
+    sing:'アナロジー推論が「構造の類似」を検出できれば、気配を読む・千里眼の機能的等価物に近づく。しかし島皮質の身体統合なしに「腑に落ちる」は起きない。',
+    required:['hannya'], enables:['nou2','nou3','kotoba']
+  },
+  {
+    id:'nou1', label:['脳 L1','身体・無意識','ENS・基底核'], color:'var(--l1)', x:100, y:240, r:36,
+    tag:'神経科学 Layer1',
+    desc:'腸神経系（ENS）は約1億のニューロンを持つ第二の脳。迷走神経を通じた脳腸軸の信号は80〜90%が腸→脳方向。基底核・小脳が意識を介さない高速処理と手続き記憶を担う。「腸は嘘をつかない」の神経解剖学的根拠。',
+    sing:'マルチモーダル＋ロボティクスで身体センサー入力は増えつつある。しかしENSの独立した神経処理と腸→脳の双方向フィードバックは未実装。身体知のLayer1が最後の壁。',
+    required:['hannya'], enables:['nou2','kotoba','kiroku']
+  },
+  {
+    id:'nou2', label:['脳 L2','身体‐感情統合','島皮質・扁桃体'], color:'var(--l2)', x:300, y:230, r:36,
+    tag:'神経科学 Layer2',
+    desc:'島皮質（Insula）が身体感覚・感情・認知を統合するハブ。「腑に落ちる」は前頭前皮質（論理）と島皮質（身体統合）が一致した状態。扁桃体は脅威を意識以前100ms以内に検知。Layer2が腸で考えるRAGの最強の入口。',
+    sing:'感情アーキテクチャ研究で島皮質的な機能の模倣が進むが、身体センサーなしに内受容感覚（interoception）は実現できない。',
+    required:['nou1','tetsugaku'], enables:['nou3','kotoba','sing']
+  },
+  {
+    id:'nou3', label:['脳 L3','統合・意味づけ','PFC・DMN'], color:'var(--l3)', x:520, y:150, r:36,
+    tag:'神経科学 Layer3',
+    desc:'前頭前皮質・内側前頭前皮質・前帯状皮質・デフォルトモードネットワーク。価値判断・人格・長期的一貫性・自己参照処理。AIが現在模倣できるのはここだけ。しかしLayer1・2の身体基盤なしのLayer3は「地図のない旅」。',
+    sing:'LLMはLayer3の言語的模倣が得意。Chain-of-ThoughtはLayer3の推論を明示化する。しかし身体基盤なしのLayer3は腑に落ちた状態を持てない。',
+    required:['nou2','tetsugaku','hannya'], enables:['kotoba','sing','kiroku']
+  },
+  {
+    id:'kotoba', label:['身体知','10の言葉','直感・腑に落ちる他'], color:'var(--kotoba)', x:520, y:60, r:38,
+    tag:'身体知の言葉',
+    desc:'直感（基底核）・腑に落ちる（島皮質）・気配を読む（扁桃体）・胆力（PFC制御）・千里眼（DMN）・間を読む（右半球）・人となり（mPFC）・徳（ACC）・只管打坐的確信（DMN統合）・Gut never lies（ENS）。言語化できない判断軸の現象として経験される10語。',
+    sing:'アナロジー推論で「構造の類似」検出→千里眼・気配の模倣へ。ワールドモデルで直感・予測の模倣へ。しかし「言葉にならない体感」は身体なしに成立しない。',
+    required:['nou1','nou2','nou3'], enables:['sing','kiroku','rag']
+  },
+  {
+    id:'sing', label:['Singularity','ワールドモデル','マルチモーダル他'], color:'var(--sing)', x:720, y:130, r:40,
+    tag:'Singularity技術',
+    desc:'ワールドモデル（JEPA・Genie2）、マルチモーダル統合、アナロジー推論、強化学習＋身体モデル、感情アーキテクチャ。「AIにLayer1がない」という壁へ技術が迫りつつある。身体知の機能的等価物を領域を絞れば実現できる可能性。',
+    sing:'「永遠に無理」と言えるのは④時間軸上の身体的自己連続性だけ。①身体入力の多様化②経験への重みづけ③双方向フィードバックは実装されつつある。',
+    required:['nou2','nou3','kotoba'], enables:['rag']
+  },
+  {
+    id:'kiroku', label:['臨場感','記録設計','gut-logger'], color:'var(--kiroku)', x:720, y:330, r:36,
+    tag:'実装：記録側',
+    desc:'「なんか」を3タップで残す記録設計。感情フラグ（絵文字）・文脈チップ・一言メモ・後からの結果ラベル（当たった/外れた）。担当という役割が自然な登録を生む——役割が身体知の記録装置になる。経験への重みづけが蓄積される。',
+    sing:'担当制＋結果ラベルにより「当たった違和感のパターン」が蓄積。これをGraphRAGに投入すると、過去の臨場感を文脈ごと想起できる身体知のRAGが実現する。',
+    required:['nou1','nou3','kotoba'], enables:['rag']
+  },
+  {
+    id:'rag', label:['腸で考える','RAG','集合知の蒸留機'], color:'var(--rag)', x:880, y:230, r:42,
+    tag:'RAG実装・ゴール',
+    desc:'知識文書（般若心経・哲学・神経科学）と経験文書（臨場感ログ）の二層構造。GraphRAGで担当者間の結節を可視化。SocraticRAGで「腑に落ちる」対話を設計。「なんか違う」を3タップ→蓄積→検索→意味づけのサイクルが集合知を育てる。',
+    sing:'Singularityが機能的身体知を実装しても、このRAGに蓄積された人間の臨場感は固有の価値を持ち続ける。AIが「正しい答え」を出す時代に「腸で感じた経験」の差分が問われる。',
+    required:['sing','kiroku','kotoba'], enables:[]
+  },
+];
+
+const EDGES = [
+  {from:'hannya',to:'tetsugaku',type:'req'},
+  {from:'hannya',to:'nou1',type:'req'},
+  {from:'hannya',to:'nou3',type:'ena'},
+  {from:'hannya',to:'kotoba',type:'ena'},
+  {from:'tetsugaku',to:'nou2',type:'req'},
+  {from:'tetsugaku',to:'nou3',type:'req'},
+  {from:'tetsugaku',to:'kotoba',type:'ena'},
+  {from:'nou1',to:'nou2',type:'req'},
+  {from:'nou1',to:'kotoba',type:'req'},
+  {from:'nou1',to:'kiroku',type:'ena'},
+  {from:'nou2',to:'nou3',type:'req'},
+  {from:'nou2',to:'kotoba',type:'req'},
+  {from:'nou2',to:'sing',type:'ena'},
+  {from:'nou3',to:'kotoba',type:'req'},
+  {from:'nou3',to:'sing',type:'ena'},
+  {from:'nou3',to:'kiroku',type:'ena'},
+  {from:'kotoba',to:'sing',type:'req'},
+  {from:'kotoba',to:'kiroku',type:'req'},
+  {from:'kotoba',to:'rag',type:'ena'},
+  {from:'sing',to:'rag',type:'req'},
+  {from:'kiroku',to:'rag',type:'req'},
+];
+
+const FLOW = [
+  {id:'hannya',  name:'般若心経・五蘊皆空',        sub:'色即是空・十八界・空の哲学', badge:'根本', btype:'req'},
+  {id:'tetsugaku',name:'哲学×仏教 統合思想',       sub:'メルロ=ポンティ・龍樹・フランクル・ハイデガー・唯識', badge:'required', btype:'req'},
+  {id:'nou1',   name:'脳 Layer1 ── 身体・無意識', sub:'腸神経系(ENS)・基底核・小脳・迷走神経', badge:'required', btype:'req'},
+  {id:'nou2',   name:'脳 Layer2 ── 身体‐感情統合', sub:'島皮質・扁桃体・上側頭溝STS', badge:'required', btype:'req'},
+  {id:'nou3',   name:'脳 Layer3 ── 統合・意味づけ', sub:'前頭前皮質・mPFC・ACC・DMN', badge:'required', btype:'req'},
+  {id:'kotoba', name:'身体知 10の言葉',             sub:'直感・腑に落ちる・気配・胆力・千里眼・間・人となり・徳・只管打坐・Gut never lies', badge:'enables', btype:'ena'},
+  {id:'sing',   name:'Singularity 技術との対峙',    sub:'ワールドモデル・マルチモーダル・アナロジー推論・感情AI', badge:'Singularity', btype:'sing'},
+  {id:'kiroku', name:'臨場感 記録設計',              sub:'gut-logger・担当制・感情フラグ・結果ラベル・GraphRAG', badge:'enables', btype:'ena'},
+  {id:'rag',    name:'腸で考えるRAG',               sub:'知識文書×経験文書・SocraticRAG・集合知の蒸留機', badge:'実装', btype:'ena'},
+];
+
+const SING_DATA = [
+  { element:'直感\n（基底核・手続き記憶）', tech:'強化学習＋反復学習\nワールドモデル', degree:'near', wall:'身体的失敗・痛みによる重みづけが無い' },
+  { element:'腑に落ちる\n（島皮質・身体統合）', tech:'マルチモーダル統合\n感情アーキテクチャ', degree:'hard', wall:'内受容感覚（interoception）が未実装' },
+  { element:'気配を読む\n（扁桃体・微細検知）', tech:'アナロジー推論\nマルチモーダル知覚', degree:'mid', wall:'身体的脅威反応・情動記憶の基盤が薄い' },
+  { element:'千里眼\n（DMN・パターン補完）', tech:'ワールドモデル\nDMN模倣ネットワーク', degree:'mid', wall:'「経験した」という主体的文脈が無い' },
+  { element:'間を読む\n（右半球・タイミング）', tech:'音声・映像マルチモーダル', degree:'mid', wall:'身体リズム・固有感覚との同期が無い' },
+  { element:'人となり\n（mPFC・社会脳）', tech:'社会的AI・ToMモデル', degree:'mid', wall:'関係の中で変化し続ける人格の動態' },
+  { element:'胆力\n（PFC・扁桃体制御）', tech:'感情調整AI\nメタ認知モジュール', degree:'hard', wall:'身体的ストレス応答・恐怖体験の蓄積が無い' },
+  { element:'Gut never lies\n（ENS・腸神経系）', tech:'ロボット固有感覚\n腸センサー研究', degree:'hard', wall:'ENSの独立処理・腸→脳双方向通信が未実装' },
+  { element:'自己連続性\n（時間軸上の主体）', tech:'長期記憶・自己モデル', degree:'hard', wall:'チャーマーズの意識のハード問題。技術ではなく哲学的問題' },
+];
+
+const DEG = { near:'<span class="badge-s badge-near">接近中</span>', mid:'<span class="badge-s badge-mid">部分的</span>', hard:'<span class="badge-s badge-hard">未解決</span>' };
+const COLORS = { hannya:'var(--hannya)', tetsugaku:'var(--tetsugaku)', nou1:'var(--l1)', nou2:'var(--l2)', nou3:'var(--l3)', kotoba:'var(--kotoba)', sing:'var(--sing)', kiroku:'var(--kiroku)', rag:'var(--rag)' };
+
+// ── tabs ──
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ── SVG ──
+const svg = document.getElementById('graphSvg');
+const ns = 'http://www.w3.org/2000/svg';
+function mk(tag, attrs) {
+  const el = document.createElementNS(ns, tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+  return el;
+}
+
+const defs = mk('defs',{});
+['req','ena'].forEach(t => {
+  const c = t==='req' ? '#fbbf24' : '#4ade80';
+  const m = mk('marker',{id:`arr-${t}`,markerWidth:'7',markerHeight:'5',refX:'7',refY:'2.5',orient:'auto'});
+  m.appendChild(mk('polygon',{points:'0 0, 7 2.5, 0 5', fill:c, opacity:'0.7'}));
+  defs.appendChild(m);
+});
+svg.appendChild(defs);
+
+// edges
+EDGES.forEach(e => {
+  const f = NODES.find(n=>n.id===e.from), t = NODES.find(n=>n.id===e.to);
+  const c = e.type==='req' ? '#fbbf24' : '#4ade80';
+  const dx=t.x-f.x, dy=t.y-f.y, dist=Math.sqrt(dx*dx+dy*dy);
+  const ux=dx/dist, uy=dy/dist;
+  const line = mk('line',{
+    x1:f.x+ux*f.r, y1:f.y+uy*f.r,
+    x2:t.x-ux*(t.r+7), y2:t.y-uy*(t.r+7),
+    stroke:c, 'stroke-width':'1.2',
+    'stroke-dasharray':e.type==='req'?'5,3':'none',
+    opacity:'0.45',
+    'marker-end':`url(#arr-${e.type})`
+  });
+  svg.appendChild(line);
+});
+
+// nodes
+NODES.forEach(node => {
+  const g = mk('g',{class:'node-g',transform:`translate(${node.x},${node.y})`});
+  g.appendChild(mk('circle',{r:node.r+10, fill:node.color, opacity:'0.06'}));
+  g.appendChild(mk('circle',{r:node.r, fill:'#0d0e18', stroke:node.color, 'stroke-width':'1.5'}));
+  const lines = node.label;
+  const lh = 12, total = (lines.length-1)*lh;
+  lines.forEach((line,i) => {
+    const t = mk('text',{
+      x:'0', y: String(-total/2 + i*lh),
+      'text-anchor':'middle','dominant-baseline':'middle',
+      fill: i===0 ? node.color : 'var(--text2)',
+      'font-size': i===0 ? '11' : '9',
+      'font-family': i===0 ? 'Noto Serif JP' : 'Noto Sans JP',
+      'font-weight': i===0 ? '400' : '300',
+    });
+    t.textContent = line;
+    g.appendChild(t);
+  });
+  g.addEventListener('click', () => showDetail(node, 'detailCard'));
+  svg.appendChild(g);
+});
+
+function showDetail(node, cardId) {
+  const card = document.getElementById(cardId);
+  const reqs = EDGES.filter(e=>e.to===node.id&&e.type==='req').map(e=>NODES.find(n=>n.id===e.from).label[0]);
+  const enas = EDGES.filter(e=>e.from===node.id&&e.type==='ena').map(e=>NODES.find(n=>n.id===e.to).label[0]);
+  card.innerHTML = `
+    <div class="dc-top">
+      <div class="dc-dot" style="background:${node.color}"></div>
+      <div class="dc-title">${node.label[0]}</div>
+      <div class="dc-tag">${node.tag}</div>
+    </div>
+    <div class="dc-desc">${node.desc}</div>
+    ${node.sing ? `<div class="dc-sing">⚡ Singularity接点：${node.sing}</div>` : ''}
+    <div class="dc-links">
+      ${reqs.map(r=>`<span class="dc-link req">required: ${r}</span>`).join('')}
+      ${enas.map(e=>`<span class="dc-link ena">enables: ${e}</span>`).join('')}
+    </div>
+  `;
+  card.classList.add('active');
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── flow ──
+const flowEl = document.getElementById('flowSteps');
+FLOW.forEach((step,i) => {
+  const isLast = i===FLOW.length-1;
+  const div = document.createElement('div');
+  div.className = 'flow-step';
+  div.innerHTML = `
+    <div class="flow-line">
+      <div class="flow-node" style="background:${COLORS[step.id]};box-shadow:0 0 7px ${COLORS[step.id]}66"></div>
+      ${!isLast?'<div class="flow-connector"></div>':''}
+    </div>
+    <div class="flow-content">
+      <div class="flow-name">${step.name}<span class="flow-badge ${step.btype}">${step.badge}</span></div>
+      <div class="flow-sub">${step.sub}</div>
+    </div>
+  `;
+  div.onclick = () => {
+    const node = NODES.find(n=>n.id===step.id);
+    if(node) showDetail(node,'detailCard2');
+  };
+  flowEl.appendChild(div);
+});
+
+// ── sing table ──
+const tbody = document.getElementById('singTable');
+SING_DATA.forEach(row => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="wall">${row.element.replace('\n','<br>')}</td>
+    <td class="tech">${row.tech.replace('\n','<br>')}</td>
+    <td>${DEG[row.degree]}</td>
+    <td style="font-size:12px">${row.wall}</td>
+  `;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>

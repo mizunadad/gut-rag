@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>腸で考える — Socratic Explorer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Noto+Sans+JP:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --surface: #0f1018;
+    --surface2: #14151f;
+    --border: #1c1e2e;
+    --border2: #252838;
+    --text: #e2e8f5;
+    --text2: #7c8db0;
+    --text3: #3d4660;
+    --hito: #f472b6;
+    --basho: #34d399;
+    --mono: #60a5fa;
+    --kokoro: #a78bfa;
+    --hito-glow: rgba(244,114,182,0.12);
+    --basho-glow: rgba(52,211,153,0.12);
+    --mono-glow: rgba(96,165,250,0.12);
+    --kokoro-glow: rgba(167,139,250,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── screens ── */
+  .screen { display:none; width:100%; max-width:520px; padding:0 20px; }
+  .screen.active { display:flex; flex-direction:column; }
+
+  /* ── SCREEN 0: Opening ── */
+  #s0 {
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+  }
+  .opening-orb {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%,
+      rgba(167,139,250,0.6),
+      rgba(96,165,250,0.3) 40%,
+      rgba(52,211,153,0.1) 70%,
+      transparent);
+    box-shadow:
+      0 0 60px rgba(167,139,250,0.2),
+      0 0 120px rgba(96,165,250,0.1);
+    margin: 0 auto 40px;
+    animation: orbPulse 4s ease-in-out infinite;
+  }
+  @keyframes orbPulse {
+    0%,100% { transform: scale(1); opacity:0.8; }
+    50% { transform: scale(1.06); opacity:1; }
+  }
+  .opening-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .opening-sub {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.9;
+    margin-bottom: 48px;
+  }
+  .btn-start {
+    padding: 14px 40px;
+    border: 1px solid var(--border2);
+    border-radius: 40px;
+    background: transparent;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.05em;
+  }
+  .btn-start:hover {
+    border-color: var(--kokoro);
+    box-shadow: 0 0 20px var(--kokoro-glow);
+    color: var(--kokoro);
+  }
+
+  /* ── SCREEN 1: Category ── */
+  #s1 { padding-top: 60px; padding-bottom: 40px; gap: 32px; }
+  .screen-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--text3);
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .screen-q {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+    text-align: center;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .cat-btn {
+    padding: 24px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .cat-btn .cat-emoji { font-size: 2rem; }
+  .cat-btn .cat-name {
+    font-size: 13px;
+    color: var(--text2);
+    letter-spacing: 0.05em;
+  }
+  .cat-btn.hito:hover  { border-color: var(--hito);   background: var(--hito-glow);   }
+  .cat-btn.basho:hover { border-color: var(--basho);  background: var(--basho-glow);  }
+  .cat-btn.mono:hover  { border-color: var(--mono);   background: var(--mono-glow);   }
+  .cat-btn.kokoro:hover{ border-color: var(--kokoro); background: var(--kokoro-glow); }
+  .cat-btn.hito.selected  { border-color: var(--hito);   background: var(--hito-glow);   }
+  .cat-btn.basho.selected { border-color: var(--basho);  background: var(--basho-glow);  }
+  .cat-btn.mono.selected  { border-color: var(--mono);   background: var(--mono-glow);   }
+  .cat-btn.kokoro.selected{ border-color: var(--kokoro); background: var(--kokoro-glow); }
+
+  /* ── SCREEN 2: Emoji pick ── */
+  #s2 { padding-top: 60px; padding-bottom: 40px; gap: 28px; }
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .emoji-btn {
+    aspect-ratio: 1;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 4px;
+  }
+  .emoji-btn .e { font-size: 1.6rem; }
+  .emoji-btn .elabel {
+    font-size: 10px;
+    color: var(--text3);
+    text-align: center;
+    line-height: 1.2;
+  }
+  .emoji-btn:hover { border-color: var(--border2); transform: scale(1.04); }
+  .emoji-btn.selected { border-color: currentColor; transform: scale(1.06); }
+  .emoji-btn.selected.hito  { color: var(--hito);  background: var(--hito-glow); }
+  .emoji-btn.selected.basho { color: var(--basho); background: var(--basho-glow); }
+  .emoji-btn.selected.mono  { color: var(--mono);  background: var(--mono-glow); }
+  .emoji-btn.selected.kokoro{ color: var(--kokoro);background: var(--kokoro-glow); }
+
+  /* ── SCREEN 3: Question + choices ── */
+  #s3 { padding-top: 60px; padding-bottom: 40px; gap: 24px; }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .breadcrumb .crumb { font-size: 1.1rem; }
+  .question-box {
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .choices-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+  .choices-grid { display: flex; flex-direction: column; gap: 8px; }
+  .choice-btn {
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    letter-spacing: 0.02em;
+  }
+  .choice-btn:hover { border-color: var(--border2); color: var(--text); }
+  .choice-btn.selected { color: var(--text); }
+  .choice-btn.selected.hito   { border-color: var(--hito);  background: var(--hito-glow); }
+  .choice-btn.selected.basho  { border-color: var(--basho); background: var(--basho-glow); }
+  .choice-btn.selected.mono   { border-color: var(--mono);  background: var(--mono-glow); }
+  .choice-btn.selected.kokoro { border-color: var(--kokoro);background: var(--kokoro-glow); }
+
+  .depth-btn {
+    margin-top: 8px;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px dashed var(--border2);
+    background: transparent;
+    color: var(--text3);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+    letter-spacing: 0.05em;
+    display: none;
+  }
+  .depth-btn.visible { display: block; }
+  .depth-btn:hover {
+    border-color: var(--kokoro);
+    color: var(--kokoro);
+    box-shadow: 0 0 16px var(--kokoro-glow);
+  }
+
+  /* ── SCREEN 4: LLM response ── */
+  #s4 { padding-top: 60px; padding-bottom: 60px; gap: 24px; }
+  .response-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .response-orb {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: orbPulse 3s ease-in-out infinite;
+  }
+  .response-orb.hito   { background: radial-gradient(circle, var(--hito), transparent); box-shadow: 0 0 16px var(--hito-glow); }
+  .response-orb.basho  { background: radial-gradient(circle, var(--basho), transparent); box-shadow: 0 0 16px var(--basho-glow); }
+  .response-orb.mono   { background: radial-gradient(circle, var(--mono), transparent); box-shadow: 0 0 16px var(--mono-glow); }
+  .response-orb.kokoro { background: radial-gradient(circle, var(--kokoro), transparent); box-shadow: 0 0 16px var(--kokoro-glow); }
+
+  .response-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.95rem;
+    color: var(--text2);
+  }
+  .response-body {
+    font-size: 14px;
+    line-height: 2;
+    color: var(--text2);
+    white-space: pre-wrap;
+    min-height: 80px;
+  }
+  .response-body.loading {
+    color: var(--text3);
+    font-style: italic;
+  }
+  .response-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+  .next-q-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+  .next-q-box {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text);
+    padding: 18px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .btn-restart {
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text3);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+  .btn-restart:hover { border-color: var(--border2); color: var(--text2); }
+
+  /* ── nav back ── */
+  .nav-back {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: color 0.2s;
+    align-self: flex-start;
+  }
+  .nav-back:hover { color: var(--text2); }
+
+  /* progress dots */
+  .progress {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+  .pdot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--border2);
+    transition: all 0.3s;
+  }
+  .pdot.active { background: var(--text2); }
+  .pdot.done   { background: var(--text3); }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 0: Opening -->
+<div class="screen active" id="s0">
+  <div class="opening-orb"></div>
+  <h1 class="opening-title">腸で考える</h1>
+  <p class="opening-sub">
+    言葉にならない感覚がある。<br>
+    理由が言えない好き、説明できない違和感。<br>
+    それを、少しだけ一緒に探ってみませんか。
+  </p>
+  <button class="btn-start" onclick="go(1)">はじめる</button>
+</div>
+
+<!-- SCREEN 1: Category -->
+<div class="screen" id="s1">
+  <span class="nav-back" onclick="go(0)">← もどる</span>
+  <div class="progress">
+    <div class="pdot active" id="pd1"></div>
+    <div class="pdot" id="pd2"></div>
+    <div class="pdot" id="pd3"></div>
+    <div class="pdot" id="pd4"></div>
+  </div>
+  <div class="screen-label">Step 1</div>
+  <div class="screen-q">今、何が気になっていますか？</div>
+  <div class="cat-grid">
+    <button class="cat-btn hito" onclick="selectCat('hito')">
+      <span class="cat-emoji">👤</span>
+      <span class="cat-name">人</span>
+    </button>
+    <button class="cat-btn basho" onclick="selectCat('basho')">
+      <span class="cat-emoji">🌍</span>
+      <span class="cat-name">場所</span>
+    </button>
+    <button class="cat-btn mono" onclick="selectCat('mono')">
+      <span class="cat-emoji">✨</span>
+      <span class="cat-name">もの</span>
+    </button>
+    <button class="cat-btn kokoro" onclick="selectCat('kokoro')">
+      <span class="cat-emoji">🫀</span>
+      <span class="cat-name">ココロの状態</span>
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 2: Emoji pick -->
+<div class="screen" id="s2">
+  <span class="nav-back" onclick="go(1)">← もどる</span>
+  <div class="progress">
+    <div class="pdot done"></div>
+    <div class="pdot active"></div>
+    <div class="pdot"></div>
+    <div class="pdot"></div>
+  </div>
+  <div class="screen-label">Step 2</div>
+  <div class="screen-q" id="s2q">どれに近いですか？</div>
+  <div class="emoji-grid" id="emojiGrid"></div>
+</div>
+
+<!-- SCREEN 3: Question + choices -->
+<div class="screen" id="s3">
+  <span class="nav-back" onclick="go(2)">← もどる</span>
+  <div class="progress">
+    <div class="pdot done"></div>
+    <div class="pdot done"></div>
+    <div class="pdot active"></div>
+    <div class="pdot"></div>
+  </div>
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <div class="question-box" id="questionBox"></div>
+  <div class="choices-label">近いものを選んでください</div>
+  <div class="choices-grid" id="choicesGrid"></div>
+  <button class="depth-btn" id="depthBtn" onclick="goDeep()">
+    もっと深く探る ↓
+  </button>
+</div>
+
+<!-- SCREEN 4: LLM response -->
+<div class="screen" id="s4">
+  <div class="progress">
+    <div class="pdot done"></div>
+    <div class="pdot done"></div>
+    <div class="pdot done"></div>
+    <div class="pdot active"></div>
+  </div>
+  <div class="response-header">
+    <div class="response-orb" id="responseOrb"></div>
+    <div class="response-title">腸からの言葉</div>
+  </div>
+  <div class="response-body loading" id="responseBody">考えています...</div>
+  <hr class="response-divider" id="responseDivider" style="display:none">
+  <div class="next-q-label" id="nextQLabel" style="display:none">次の問い</div>
+  <div class="next-q-box" id="nextQBox" style="display:none"></div>
+  <button class="btn-restart" onclick="restart()" id="restartBtn" style="display:none">
+    最初からやり直す
+  </button>
+</div>
+
+<script>
+// ── Data ──
+const EMOJIS = {
+  hito: [
+    { e:'👵', label:'祖父母' },
+    { e:'👫', label:'旧友' },
+    { e:'🧑‍🏫', label:'恩師' },
+    { e:'👶', label:'子供' },
+    { e:'🤝', label:'初対面の人' },
+    { e:'🧘', label:'自分自身' },
+    { e:'💼', label:'仕事の誰か' },
+    { e:'❓', label:'なんとなく' },
+  ],
+  basho: [
+    { e:'🏔️', label:'山' },
+    { e:'🌊', label:'海' },
+    { e:'🏠', label:'実家' },
+    { e:'☕', label:'いつもの店' },
+    { e:'🌳', label:'自然・公園' },
+    { e:'🏙️', label:'都市の夜' },
+    { e:'⛩️', label:'静かな場所' },
+    { e:'❓', label:'なんとなく' },
+  ],
+  mono: [
+    { e:'🎵', label:'音楽' },
+    { e:'📖', label:'本' },
+    { e:'🍳', label:'食・料理' },
+    { e:'⚙️', label:'道具' },
+    { e:'🌅', label:'景色・光' },
+    { e:'🎞️', label:'思い出' },
+    { e:'🖊️', label:'言葉' },
+    { e:'❓', label:'なんとなく' },
+  ],
+  kokoro: [
+    { e:'😌', label:'穏やか' },
+    { e:'🌀', label:'モヤモヤ' },
+    { e:'⚡', label:'ざわざわ' },
+    { e:'🌧️', label:'重い' },
+    { e:'✨', label:'ワクワク' },
+    { e:'🔥', label:'熱い' },
+    { e:'😶', label:'空っぽ' },
+    { e:'🌫️', label:'ぼんやり' },
+    { e:'😢', label:'泣きたい' },
+    { e:'😤', label:'うまく言えない' },
+  ],
+};
+
+const QUESTIONS = {
+  hito: {
+    q: 'その人のことを思うと、何を感じますか？',
+    choices: ['安心する', 'なぜか気になる', '会いたくなる', 'ちょっと怖い', 'ありがたい', 'なんとなく']
+  },
+  basho: {
+    q: 'その場所にいる自分を想像すると、何が浮かびますか？',
+    choices: ['静けさ', '解放感', '懐かしさ', 'ひとりになれる', '何かが始まる気がする', 'なんとなく']
+  },
+  mono: {
+    q: 'それに触れる時、体のどこかで何かを感じますか？',
+    choices: ['胸があたたかくなる', '背筋が伸びる', '時間を忘れる', '涙が出そうになる', '理由はわからない', 'なんとなく']
+  },
+  kokoro: {
+    q: 'その感覚、体のどのあたりにありますか？',
+    choices: ['胸のあたり', '喉のあたり', 'お腹の奥', '頭の中', '全体的に', 'うまく言えない']
+  },
+};
+
+// ── State ──
+let state = { cat: null, emoji: null, choice: null };
+
+// ── Navigation ──
+function go(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── Category select ──
+function selectCat(cat) {
+  state.cat = cat;
+  state.emoji = null;
+  state.choice = null;
+
+  // build emoji grid
+  const grid = document.getElementById('emojiGrid');
+  grid.innerHTML = '';
+  EMOJIS[cat].forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = `emoji-btn ${cat}`;
+    btn.innerHTML = `<span class="e">${item.e}</span><span class="elabel">${item.label}</span>`;
+    btn.onclick = () => selectEmoji(item, btn, cat);
+    grid.appendChild(btn);
+  });
+
+  const qs = { hito:'誰のことが頭にありますか？', basho:'どんな場所が浮かびますか？', mono:'何を思い浮かべていますか？', kokoro:'今、心はどんな状態ですか？' };
+  document.getElementById('s2q').textContent = qs[cat];
+  go(2);
+}
+
+// ── Emoji select ──
+function selectEmoji(item, btn, cat) {
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.emoji = item;
+
+  setTimeout(() => buildQuestion(cat), 220);
+}
+
+function buildQuestion(cat) {
+  const data = QUESTIONS[cat];
+  const color = { hito: 'var(--hito)', basho: 'var(--basho)', mono: 'var(--mono)', kokoro: 'var(--kokoro)' }[cat];
+
+  // breadcrumb
+  document.getElementById('breadcrumb').innerHTML =
+    `<span class="crumb">${state.emoji.e}</span><span style="color:var(--text3)">›</span><span style="font-size:12px;color:var(--text2)">${state.emoji.label}</span>`;
+
+  document.getElementById('questionBox').textContent = data.q;
+
+  const grid = document.getElementById('choicesGrid');
+  grid.innerHTML = '';
+  data.choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = `choice-btn ${cat}`;
+    btn.textContent = c;
+    btn.onclick = () => selectChoice(c, btn, cat);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('depthBtn').classList.remove('visible');
+  go(3);
+}
+
+// ── Choice select ──
+function selectChoice(choice, btn, cat) {
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.choice = choice;
+
+  setTimeout(() => {
+    document.getElementById('depthBtn').classList.add('visible');
+  }, 300);
+}
+
+// ── Go deep: call LLM ──
+async function goDeep() {
+  const catNames = { hito:'人', basho:'場所', mono:'もの', kokoro:'ココロ' };
+  document.getElementById('responseOrb').className = `response-orb ${state.cat}`;
+  document.getElementById('responseBody').textContent = '考えています...';
+  document.getElementById('responseBody').className = 'response-body loading';
+  document.getElementById('responseDivider').style.display = 'none';
+  document.getElementById('nextQLabel').style.display = 'none';
+  document.getElementById('nextQBox').style.display = 'none';
+  document.getElementById('restartBtn').style.display = 'none';
+  go(4);
+
+  const prompt = `あなたは「腸で考える」という概念を体現したSocraticコーチです。
+身体知・現象学・仏教の五蘊・神経科学（島皮質・扁桃体・腸神経系）を背景に持ちながら、
+ユーザーが言語化しにくい感覚を、温かく、詩的に、しかし鋭く照らします。
+
+ユーザーの選択：
+- カテゴリ：${catNames[state.cat]}
+- 選んだ絵文字：${state.emoji.e}（${state.emoji.label}）
+- 感じていること：${state.choice}
+
+以下の形式で日本語で返してください：
+
+【気づき】
+（3〜4文。ユーザーの選択から見えてくる身体知・感覚の正体を、神経科学や哲学・仏教を自然に織り交ぜながら、詩的に言語化する。難しい言葉は使わない。）
+
+【次の問い】
+（1文。答えを求めず、さらに深い感覚へ誘う問い。）
+
+形式通りに返してください。余計な説明は不要です。`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(b => b.text || '').join('');
+
+    // parse
+    const kidzukiMatch = text.match(/【気づき】\s*([\s\S]*?)(?=【次の問い】|$)/);
+    const nextMatch = text.match(/【次の問い】\s*([\s\S]*?)$/);
+
+    const kidzuki = kidzukiMatch ? kidzukiMatch[1].trim() : text;
+    const nextQ = nextMatch ? nextMatch[1].trim() : '';
+
+    document.getElementById('responseBody').textContent = kidzuki;
+    document.getElementById('responseBody').className = 'response-body';
+
+    if (nextQ) {
+      document.getElementById('responseDivider').style.display = 'block';
+      document.getElementById('nextQLabel').style.display = 'block';
+      document.getElementById('nextQBox').textContent = nextQ;
+      document.getElementById('nextQBox').style.display = 'block';
+    }
+    document.getElementById('restartBtn').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('responseBody').textContent = 'うまく繋がれませんでした。もう一度試してみてください。';
+    document.getElementById('responseBody').className = 'response-body';
+    document.getElementById('restartBtn').style.display = 'block';
+  }
+}
+
+function restart() {
+  state = { cat: null, emoji: null, choice: null };
+  go(0);
+}
+</script>
+</body>
+</html>

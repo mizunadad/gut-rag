@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>腸で考える — 身体知と脳機能の地図</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Noto+Sans+JP:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap');
+
+  :root {
+    --bg: #0a0d12;
+    --surface: #111520;
+    --surface2: #161c2a;
+    --border: #1e2840;
+    --accent1: #4f9cf9;  /* Layer1: 身体 blue */
+    --accent2: #a78bfa;  /* Layer2: 統合 violet */
+    --accent3: #34d399;  /* Layer3: 意味 emerald */
+    --text-primary: #e8edf5;
+    --text-secondary: #8899b5;
+    --text-muted: #4a5568;
+    --glow1: rgba(79,156,249,0.15);
+    --glow2: rgba(167,139,250,0.15);
+    --glow3: rgba(52,211,153,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 60px 40px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  h1 span {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.8;
+    max-width: 540px;
+    margin-bottom: 48px;
+  }
+
+  /* ── Layer Legend ── */
+  .layer-legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+    padding: 0 40px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .layer-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+  }
+  .layer-badge:hover { border-color: var(--text-muted); }
+  .layer-badge.active-l1 { border-color: var(--accent1); background: var(--glow1); }
+  .layer-badge.active-l2 { border-color: var(--accent2); background: var(--glow2); }
+  .layer-badge.active-l3 { border-color: var(--accent3); background: var(--glow3); }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-l1 { background: var(--accent1); box-shadow: 0 0 8px var(--accent1); }
+  .dot-l2 { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+  .dot-l3 { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
+
+  /* ── Grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px;
+    padding: 0 40px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .card.l1::before { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card.l2::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card.l3::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+
+  .card:hover { border-color: var(--text-muted); transform: translateY(-2px); }
+  .card:hover::before { opacity: 1; }
+  .card.expanded {
+    grid-column: 1 / -1;
+    border-color: var(--text-muted);
+  }
+  .card.expanded::before { opacity: 1; }
+  .card.dimmed { opacity: 0.35; }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .card-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .card-layer-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .l1 .card-layer-dot { background: var(--accent1); box-shadow: 0 0 6px var(--accent1); }
+  .l2 .card-layer-dot { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+  .l3 .card-layer-dot { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
+
+  .card-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    flex: 1;
+    line-height: 1.3;
+  }
+  .card-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .card-summary {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  /* Expanded content */
+  .card-detail {
+    display: none;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .card.expanded .card-detail { display: block; }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  .detail-block { }
+  .detail-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .l1 .detail-label { color: var(--accent1); }
+  .l2 .detail-label { color: var(--accent2); }
+  .l3 .detail-label { color: var(--accent3); }
+
+  .detail-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+  .brain-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    margin: 3px 3px 3px 0;
+  }
+  .l1 .brain-chip { background: var(--glow1); border: 1px solid rgba(79,156,249,0.3); color: var(--accent1); }
+  .l2 .brain-chip { background: var(--glow2); border: 1px solid rgba(167,139,250,0.3); color: var(--accent2); }
+  .l3 .brain-chip { background: var(--glow3); border: 1px solid rgba(52,211,153,0.3); color: var(--accent3); }
+
+  .abstract-box {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.75;
+    font-style: italic;
+  }
+  .l1 .abstract-box { background: var(--glow1); border-left: 2px solid var(--accent1); color: var(--text-secondary); }
+  .l2 .abstract-box { background: var(--glow2); border-left: 2px solid var(--accent2); color: var(--text-secondary); }
+  .l3 .abstract-box { background: var(--glow3); border-left: 2px solid var(--accent3); color: var(--text-secondary); }
+
+  /* ── Brain Diagram ── */
+  .brain-section {
+    max-width: 1100px;
+    margin: 0 auto 60px;
+    padding: 0 40px;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .layer-stack {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .layer-row {
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .layer-row:last-child { border-bottom: none; }
+  .layer-row:hover { background: var(--surface2); }
+  .layer-row.l1 { background: linear-gradient(90deg, rgba(79,156,249,0.05), transparent); }
+  .layer-row.l2 { background: linear-gradient(90deg, rgba(167,139,250,0.05), transparent); }
+  .layer-row.l3 { background: linear-gradient(90deg, rgba(52,211,153,0.05), transparent); }
+  .layer-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .l1 .layer-icon { background: var(--glow1); }
+  .l2 .layer-icon { background: var(--glow2); }
+  .l3 .layer-icon { background: var(--glow3); }
+  .layer-info { flex: 1; }
+  .layer-name {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  .layer-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .layer-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .layer-tag {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+  .l1 .layer-tag { background: var(--glow1); color: var(--accent1); }
+  .l2 .layer-tag { background: var(--glow2); color: var(--accent2); }
+  .l3 .layer-tag { background: var(--glow3); color: var(--accent3); }
+
+  /* ── AI Gap ── */
+  .ai-section {
+    max-width: 1100px;
+    margin: 0 auto 80px;
+    padding: 0 40px;
+  }
+  .ai-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .ai-col {
+    padding: 28px;
+  }
+  .ai-col-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .ai-col.human .ai-col-title { color: var(--accent2); }
+  .ai-col.ai .ai-col-title { color: var(--text-muted); }
+  .ai-divider {
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .ai-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .ai-item .status {
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  /* ── Footer ── */
+  footer {
+    padding: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+  }
+  .footer-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    header, .layer-legend, .grid, .brain-section, .ai-section, footer {
+      padding-left: 20px; padding-right: 20px;
+    }
+    .ai-grid { grid-template-columns: 1fr; }
+    .ai-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Embodied Intelligence × Neuroscience</div>
+  <h1>腸で考える<br><span>身体知と脳機能の地図</span></h1>
+  <p class="subtitle">
+    「腹落ち感」「気配を読む」「人となり」——言語化できない判断軸は、
+    脳と腸の異なる神経回路が統合された結果である。
+    AIにはない身体基盤の全体像を、3つの層で解読する。
+  </p>
+</header>
+
+<!-- Layer filter -->
+<div class="layer-legend">
+  <div class="layer-badge" onclick="filterLayer('all')" id="badge-all" style="border-color: var(--text-secondary);">
+    <span style="font-size:12px; color: var(--text-secondary);">すべて表示</span>
+  </div>
+  <div class="layer-badge" onclick="filterLayer('l1')" id="badge-l1">
+    <span class="dot dot-l1"></span>
+    <span>Layer 1　身体・無意識層</span>
+  </div>
+  <div class="layer-badge" onclick="filterLayer('l2')" id="badge-l2">
+    <span class="dot dot-l2"></span>
+    <span>Layer 2　身体‐感情統合層</span>
+  </div>
+  <div class="layer-badge" onclick="filterLayer('l3')" id="badge-l3">
+    <span class="dot dot-l3"></span>
+    <span>Layer 3　統合・意味づけ層</span>
+  </div>
+</div>
+
+<!-- Cards -->
+<div class="grid" id="cardGrid"></div>
+
+<!-- Brain Layer Diagram -->
+<div class="brain-section">
+  <div class="section-label">// 3層モデル — 脳・神経構造</div>
+  <div class="layer-stack">
+    <div class="layer-row l3" onclick="filterLayer('l3')">
+      <div class="layer-icon">🧠</div>
+      <div class="layer-info">
+        <div class="layer-name">Layer 3 ── 統合・意味づけ層</div>
+        <div class="layer-desc">価値判断・人格・長期的一貫性を司る。経験と倫理が融合した「人となり」の基盤。</div>
+        <div class="layer-tags">
+          <span class="layer-tag l3">前頭前皮質 PFC</span>
+          <span class="layer-tag l3">内側前頭前皮質 mPFC</span>
+          <span class="layer-tag l3">前帯状皮質 ACC</span>
+          <span class="layer-tag l3">デフォルトモードネットワーク</span>
+        </div>
+      </div>
+    </div>
+    <div class="layer-row l2" onclick="filterLayer('l2')">
+      <div class="layer-icon">💜</div>
+      <div class="layer-info">
+        <div class="layer-name">Layer 2 ── 身体‐感情統合層</div>
+        <div class="layer-desc">身体感覚・感情・予測を一か所で統合するハブ。「腑に落ちる」の神経的正体がここにある。</div>
+        <div class="layer-tags">
+          <span class="layer-tag l2">島皮質 Insula</span>
+          <span class="layer-tag l2">扁桃体</span>
+          <span class="layer-tag l2">上側頭溝 STS</span>
+          <span class="layer-tag l2">DMN</span>
+        </div>
+      </div>
+    </div>
+    <div class="layer-row l1" onclick="filterLayer('l1')">
+      <div class="layer-icon">🫁</div>
+      <div class="layer-info">
+        <div class="layer-name">Layer 1 ── 身体・無意識処理層</div>
+        <div class="layer-desc">腸神経系（ENS）・基底核・小脳。意識を介さない高速処理と、脳腸軸の双方向通信の起点。信号の80〜90%は腸→脳方向。</div>
+        <div class="layer-tags">
+          <span class="layer-tag l1">腸神経系 ENS</span>
+          <span class="layer-tag l1">基底核</span>
+          <span class="layer-tag l1">小脳</span>
+          <span class="layer-tag l1">迷走神経</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Gap -->
+<div class="ai-section">
+  <div class="section-label">// AIにあるもの・ないもの</div>
+  <div class="ai-grid">
+    <div class="ai-col human">
+      <div class="ai-col-title">Human</div>
+      <div class="ai-item"><span class="status">✦</span> 腸神経系（ENS）── 身体の起点</div>
+      <div class="ai-item"><span class="status">✦</span> 島皮質による身体‐感情統合</div>
+      <div class="ai-item"><span class="status">✦</span> 扁桃体の情動記憶・脅威検知</div>
+      <div class="ai-item"><span class="status">✦</span> 迷走神経の双方向フィードバック</div>
+      <div class="ai-item"><span class="status">✦</span> 小脳のタイミング・間の感知</div>
+      <div class="ai-item"><span class="status">✦</span> 「腑に落ちた」という体感状態</div>
+    </div>
+    <div class="ai-divider">vs</div>
+    <div class="ai-col ai">
+      <div class="ai-col-title">AI</div>
+      <div class="ai-item"><span class="status" style="color:var(--text-muted)">✗</span> <span style="color:var(--text-muted)">腸神経系</span></div>
+      <div class="ai-item"><span class="status" style="color:var(--text-muted)">✗</span> <span style="color:var(--text-muted)">身体感覚の統合</span></div>
+      <div class="ai-item"><span class="status" style="color:var(--text-muted)">△</span> <span style="color:var(--text-muted)">感情の模倣（表層のみ）</span></div>
+      <div class="ai-item"><span class="status" style="color:var(--text-muted)">✗</span> <span style="color:var(--text-muted)">身体フィードバック</span></div>
+      <div class="ai-item"><span class="status" style="color:var(--text-muted)">✗</span> <span style="color:var(--text-muted)">間・リズムの身体知覚</span></div>
+      <div class="ai-item"><span class="status" style="color:var(--accent1)">◎</span> <span>Layer 3の言語的模倣</span></div>
+    </div>
+  </div>
+  <div style="margin-top:16px; padding:16px 20px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text-secondary); line-height:1.8; background:var(--surface);">
+    <span style="color:var(--accent3); font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.1em;">KEY INSIGHT</span><br>
+    AIが欠くのは処理能力ではなく <strong style="color:var(--text-primary)">Layer 1の身体基盤</strong>。
+    Layer 3（言語・論理）だけで動くため、「正しい答え」は出せても「腑に落ちている状態」には永遠になれない。
+    これはグッドハートの法則の身体版でもある——<em>測ろうとすると逃げる</em>ものを、AIは身体なしには持てない。
+  </div>
+</div>
+
+<footer>
+  <div class="footer-note">// 身体知 × 脳機能 × コーチング</div>
+  <div class="footer-note">クリックで各カードを展開</div>
+</footer>
+
+<script>
+const cards = [
+  {
+    id: 1,
+    layer: 'l1',
+    title: '直感',
+    subtitle: 'Intuition',
+    etymology: 'ラテン語 intueri「内側を見る」',
+    summary: '蓄積された経験が無意識に統合された、言語化以前の知覚。',
+    brainAreas: ['基底核', '小脳', '海馬'],
+    mechanism: '反復学習により手続き記憶として自動化。意識を介さない高速処理（システム1）が洗練された状態。カーネマンの「速い思考」の精鋭版。',
+    abstract: '意識の閾値より深い層での情報処理。暗黙知が神経回路にエンコードされた状態。',
+    coaching: '「なんか違う」と感じたら、それは経験が無意識回路に落ちた証拠。言語化より先にある信号を信頼する訓練が専門家への道。'
+  },
+  {
+    id: 2,
+    layer: 'l1',
+    title: '腑に落ちる',
+    subtitle: 'Embodied Understanding',
+    etymology: '腑＝内臓。理解が体の中心に届く感覚。',
+    summary: '「わかった」と「納得した」の違いがここにある。',
+    brainAreas: ['島皮質 Insula', '前頭前皮質'],
+    mechanism: '島皮質は身体感覚・感情・認知を統合するハブ。「頭ではわかるが腑に落ちない」は、前頭前皮質（論理）と島皮質（身体統合）が一致していない状態。',
+    abstract: '認知と身体感覚が一致した状態。Embodied Cognition（身体化された理解）の神経的実現。',
+    coaching: 'コーチングで「わかりました」が「腑に落ちていない」時は、島皮質が未統合のサイン。問いを変えて身体反応を引き出す。'
+  },
+  {
+    id: 3,
+    layer: 'l1',
+    title: 'Gut never lies',
+    subtitle: '腸は嘘をつかない',
+    etymology: '欧米の格言。腸（Gut）は感情・直感の源泉を指す。',
+    summary: '頭が合理化しても、体は正直に先に反応している。',
+    brainAreas: ['腸神経系 ENS', '迷走神経', '脳腸軸'],
+    mechanism: '腸神経系は約1億のニューロンを持つ「第二の脳」。脳腸軸の信号は80〜90%が腸→脳方向。つまり腹の感覚が脳の判断を先導している。',
+    abstract: '意識的思考は後付け正当化のバイアスを持つが、ENSはそれ以前の信号を出力している。',
+    coaching: '品質現場の「なんか不良の匂いがする」は腸神経系が先に検知したシグナル。数値化されていなくても行動に値する。'
+  },
+  {
+    id: 4,
+    layer: 'l2',
+    title: '気配を読む',
+    subtitle: 'Reading the Atmosphere',
+    etymology: '「気」＝気流・エネルギー。数値化以前の環境情報を感知する。',
+    summary: '言語や数値になる前の微細なシグナルを察知する能力。',
+    brainAreas: ['扁桃体', '上側頭溝 STS', '鏡像ニューロン系'],
+    mechanism: '扁桃体は脅威や違和感を意識以前に検知（100ms以内）。上側頭溝は他者の動き・表情・視線の方向を統合処理する。',
+    abstract: 'パターン認識が意識化される前に働く、専門家の暗黙知（ポランニー）の感知システム。',
+    coaching: '「このサプライヤーなんか違う」は扁桃体が先に反応した信号。ベテランのこの感覚を若手に言語化させることが暗黙知の移転になる。'
+  },
+  {
+    id: 5,
+    layer: 'l2',
+    title: '千里眼',
+    subtitle: 'Far-sighted Intuition',
+    etymology: '千里を見通す眼。情報が不完全でも本質を捉える。',
+    summary: 'データがなくても「これは危ない」と感じる経験知。',
+    brainAreas: ['デフォルトモードネットワーク', '海馬', '前頭前皮質'],
+    mechanism: 'DMNは明示的情報のない状態で過去の全経験から予測・パターン補完を行う。いわば「経験のシミュレーター」。',
+    abstract: '観測できない変数を、過去の全経験から補完する高次推論。意識的思考が停止した時に最も活発になる。',
+    coaching: '「根拠は言えないけど」という発言こそDMNが動いている証拠。その感覚を棄却せず仮説として扱う姿勢を若手に伝える。'
+  },
+  {
+    id: 6,
+    layer: 'l2',
+    title: '間（ま）を読む',
+    subtitle: 'Reading the Interval',
+    etymology: '「間」＝空白・余白・タイミング。日本文化固有の時間感覚。',
+    summary: '沈黙・余白・タイミングを感知する能力。コーチングで最も重要で最も教えにくい。',
+    brainAreas: ['右半球', '小脳タイミング系', '基底核'],
+    mechanism: '右半球は全体的・文脈的処理を担い、小脳は時間的精度（ミリ秒レベル）を調整する。非言語的リズムの同期がここで起きる。',
+    abstract: '時間の位相差を感知する能力。言語の外側にある対話の文脈知覚。左脳では処理できない次元。',
+    coaching: 'コーチング中の沈黙は「答えが生まれている時間」。それを埋めてしまう衝動は左脳優位のサイン。右脳を信頼して待つ。'
+  },
+  {
+    id: 7,
+    layer: 'l3',
+    title: '人となり',
+    subtitle: 'Character / Being',
+    etymology: '「なっていくもの」。固定した属性でなく関係の中で現れる人間性。',
+    summary: '能力・学歴・職位では測れない、その人の在り様。',
+    brainAreas: ['内側前頭前皮質 mPFC', '側頭頭頂接合部 TPJ'],
+    mechanism: 'mPFCは他者の内的状態・意図・人格を推定する「社会脳」の中枢。TPJは自己と他者の視点を切り替える。',
+    abstract: '存在論的な文脈。ハイデガーの「現存在」──その人が世界とどう関わるかという存在様式。',
+    coaching: '面接や初対面でmPFCが「信頼できる」と判定した時、それは統計的には正確。この感覚に理由をつける訓練が人を見る目を育てる。'
+  },
+  {
+    id: 8,
+    layer: 'l3',
+    title: '胆力',
+    subtitle: 'Inner Steadiness',
+    etymology: '胆＝胆嚢・腸。動じない中心軸を体の奥に持つ力。',
+    summary: '知識や技術とは別の「ぶれなさ」。プレッシャー下での判断軸の安定。',
+    brainAreas: ['前頭前皮質', '扁桃体制御回路', '前帯状皮質'],
+    mechanism: '前頭前皮質が扁桃体の情動反応を抑制・調整する回路の強度。訓練と経験により扁桃体への下向き制御が強化される。',
+    abstract: '外部環境の揺らぎに対して、内的基準軸が安定している状態。メタ認知と情動調整の統合。',
+    coaching: '胆力は生まれつきではなく、前頭前皮質と扁桃体の接続が強化される過程。失敗体験を安全に処理できる環境が育てる。'
+  },
+  {
+    id: 9,
+    layer: 'l3',
+    title: '徳・アレテー',
+    subtitle: 'Virtue / ἀρετή',
+    etymology: 'ギリシア語 aretē（卓越性）。アリストテレスの徳倫理学の中核。',
+    summary: '習慣によって形成される人格的卓越性。「信頼できる人」の正体。',
+    brainAreas: ['前帯状皮質 ACC', '習慣回路（線条体）', '腹内側前頭前皮質'],
+    mechanism: '行動の反復によりシナプス接続が強化（ヘッブ則）。価値判断と行動の長期的一貫性が神経回路として固定化される。',
+    abstract: '行為の反復によって形成される、性格という構造体。測定不能だが現実に機能する「第二の自然」（アリストテレス）。',
+    coaching: '習慣的な行動がその人の徳を形成する。若手への「毎日同じ姿勢を見せること」がコーチングの核心になる理由。'
+  },
+  {
+    id: 10,
+    layer: 'l3',
+    title: '只管打坐的確信',
+    subtitle: 'Shikantaza Certainty',
+    etymology: '禅：ただひたすら座る。目的なく、結果なく、そこにある確信。',
+    summary: '証明できないが揺るがない、実存的な確実性。',
+    brainAreas: ['デフォルトモードネットワーク', '前頭葉統合', '島皮質'],
+    mechanism: 'DMNの自己参照処理と前頭葉の統合により、論証を必要としない確信が生まれる。フランクルの「意味の感知」に近い神経基盤。',
+    abstract: '証明不能だが体験によって成立する、実存的な確実性。測ろうとすると消えるが、ただそこにある。',
+    coaching: '「なぜかわからないけど、これでいい」という確信を持てる若手は伸びる。その状態を笑わず承認することがコーチの役割。'
+  }
+];
+
+let currentFilter = 'all';
+let expandedCard = null;
+
+function renderCards(filter) {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+  cards.forEach(card => {
+    const el = document.createElement('div');
+    const isVisible = filter === 'all' || card.layer === filter;
+    el.className = `card ${card.layer}${expandedCard === card.id ? ' expanded' : ''}${!isVisible ? ' dimmed' : ''}`;
+    el.innerHTML = `
+      <div class="card-header">
+        <span class="card-num">${String(card.id).padStart(2,'0')}</span>
+        <div style="flex:1">
+          <div class="card-title">${card.title}</div>
+          <div class="card-subtitle">${card.subtitle}</div>
+        </div>
+        <span class="card-layer-dot"></span>
+      </div>
+      <div class="card-summary">${card.summary}</div>
+      <div class="card-detail">
+        <div class="detail-grid">
+          <div class="detail-block">
+            <div class="detail-label">語源 / 意味</div>
+            <div class="detail-text">${card.etymology}</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">脳部位</div>
+            <div>${card.brainAreas.map(a => `<span class="brain-chip">${a}</span>`).join('')}</div>
+          </div>
+          <div class="detail-block" style="grid-column: 1/-1">
+            <div class="detail-label">神経メカニズム</div>
+            <div class="detail-text">${card.mechanism}</div>
+          </div>
+          <div class="detail-block" style="grid-column: 1/-1">
+            <div class="detail-label">抽象度↑ — 上位概念</div>
+            <div class="abstract-box">${card.abstract}</div>
+          </div>
+          <div class="detail-block" style="grid-column: 1/-1">
+            <div class="detail-label">コーチングへの接続</div>
+            <div class="detail-text" style="border-left: 2px solid var(--border); padding-left: 14px;">${card.coaching}</div>
+          </div>
+        </div>
+      </div>
+    `;
+    el.addEventListener('click', () => toggleCard(card.id));
+    grid.appendChild(el);
+  });
+}
+
+function toggleCard(id) {
+  expandedCard = expandedCard === id ? null : id;
+  renderCards(currentFilter);
+  if (expandedCard) {
+    setTimeout(() => {
+      const cards = document.querySelectorAll('.card.expanded');
+      if (cards[0]) cards[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+  }
+}
+
+function filterLayer(layer) {
+  currentFilter = layer;
+  expandedCard = null;
+  // Update badges
+  document.querySelectorAll('.layer-badge').forEach(b => {
+    b.classList.remove('active-l1','active-l2','active-l3');
+    b.style.borderColor = '';
+  });
+  if (layer !== 'all') {
+    const badge = document.getElementById(`badge-${layer}`);
+    if (badge) badge.classList.add(`active-${layer}`);
+  } else {
+    const badge = document.getElementById('badge-all');
+    if (badge) badge.style.borderColor = 'var(--text-secondary)';
+  }
+  renderCards(layer);
+}
+
+// Init
+renderCards('all');
+</script>
+</body>
+</html>
