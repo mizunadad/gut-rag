@@ -1,1 +1,39 @@
+# 内部文書
 gut-rag-handover.md
+
+# 環境変数・APIキー
+.env
+.env.local
+.env.*.local
+*.env
+
+# APIキーファイル
+secrets.json
+config.local.json
+api_keys.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python（将来RAGスクリプトを追加した時のため）
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+
+# Node（将来的に使う可能性）
+node_modules/
+npm-debug.log
+
+# ログ・一時ファイル
+*.log
+tmp/
+temp/
