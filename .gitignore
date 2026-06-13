@@ -35,6 +35,8 @@ npm-debug.log
 
 # ログ・一時ファイル
 *.log
+*.bak
 tmp/
 temp/
 Articles_構想.md
+gut-rag-skill.md
