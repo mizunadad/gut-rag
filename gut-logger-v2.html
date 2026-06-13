@@ -586,8 +586,9 @@ function saveCustomCtx() {
     customContexts.push(val);
     saveContexts();
   }
-  draft.context = val;
+  // draft.contextをセットしてから再描画（リセットされないよう後で上書き）
   buildContextChips();
+  draft.context = val;
   // 追加したチップを選択状態に
   const chips = document.querySelectorAll('#contextChips .chip:not(.custom-add)');
   chips.forEach(c => { if (c.textContent === val) c.classList.add('selected'); });
@@ -627,7 +628,7 @@ function showToast(msg) {
 }
 
 function setResult(id, result) {
-  const log = logs.find(l => l.id === id);
+  const log = logs.find(l => String(l.id) === String(id));
   if (log) {
     log.result = log.result === result ? 'pending' : result;
     saveLogs();
@@ -636,7 +637,8 @@ function setResult(id, result) {
 }
 
 function deleteLog(id) {
-  logs = logs.filter(l => l.id !== id);
+  // IDは数値・文字列混在の可能性があるため両方でマッチ
+  logs = logs.filter(l => String(l.id) !== String(id));
   saveLogs();
   renderLogs();
 }
