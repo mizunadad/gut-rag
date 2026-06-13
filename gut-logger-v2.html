@@ -2,6 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f59e0b">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>腸の記録 — パターンを見る</title>
 <style>
@@ -666,6 +668,13 @@ function renderPattern(){
 }
 
 renderLogs();
+</script>
+<script>
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js")
+    .then(()=>console.log("SW registered"))
+    .catch(e=>console.error(e));
+}
 </script>
 </body>
 </html>
