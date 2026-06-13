@@ -323,6 +323,74 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   .empty { text-align: center; padding: 36px 16px; color: var(--text3); font-size: 13px; line-height: 1.8; }
+
+  /* meaning modal */
+  .meaning-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5,6,10,0.88); backdrop-filter: blur(10px);
+    display: none; align-items: flex-end; justify-content: center; z-index: 150;
+  }
+  .meaning-overlay.active { display: flex; }
+  .meaning-modal {
+    width: 100%; max-width: 500px; background: var(--surface);
+    border: 1px solid var(--border2); border-radius: 24px 24px 0 0;
+    padding: 20px 18px 36px; max-height: 85vh; overflow-y: auto;
+    animation: slideUp 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  .meaning-title-row { margin-bottom: 4px; }
+  .meaning-title {
+    font-family: 'Noto Serif JP', serif; font-size: 1.15rem;
+    line-height: 1.5;
+  }
+  .meaning-title.good { color: var(--good); }
+  .meaning-title.bad  { color: var(--bad); }
+  .meaning-prompt {
+    font-size: 12px; color: var(--text3); margin: 10px 0 16px; line-height: 1.7;
+  }
+  .meaning-section-label {
+    font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace;
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .meaning-tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+  .meaning-note-input {
+    width: 100%; padding: 11px 14px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    font-weight: 300; resize: none; transition: border 0.2s; margin-bottom: 18px;
+  }
+  .meaning-note-input:focus { outline: none; border-color: var(--signal); }
+  .meaning-note-input::placeholder { color: var(--text3); }
+  .meaning-nav { display: flex; gap: 8px; }
+  .meaning-skip-btn {
+    flex: 1; padding: 12px; border-radius: 10px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text3); font-size: 12px; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; transition: all 0.2s;
+  }
+  .meaning-skip-btn:hover { border-color: var(--border2); color: var(--text2); }
+  .meaning-save-btn {
+    flex: 2; padding: 12px; border-radius: 10px;
+    border: 1px solid var(--signal); background: var(--signal);
+    color: #1a1206; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: opacity 0.2s;
+  }
+  .meaning-save-btn:hover { opacity: 0.88; }
+
+  /* meaning display on log card */
+  .meaning-row {
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-wrap: wrap; gap: 5px; align-items: flex-start;
+  }
+  .meaning-chip-display {
+    font-size: 10px; padding: 3px 9px; border-radius: 10px;
+    border: 1px solid var(--border2); color: var(--text3);
+    font-family: 'DM Mono', monospace; background: var(--surface2);
+  }
+  .meaning-note-display {
+    width: 100%; font-size: 11px; color: var(--text2);
+    font-style: italic; line-height: 1.6; margin-top: 2px;
+  }
 </style>
 </head>
 <body>
@@ -412,6 +480,25 @@
   </div>
 </div>
 
+<!-- Meaning Modal -->
+<div class="meaning-overlay" id="meaningOverlay">
+  <div class="meaning-modal">
+    <div class="modal-handle"></div>
+    <div class="meaning-title-row">
+      <div class="meaning-title" id="meaningTitle"></div>
+    </div>
+    <div class="meaning-prompt" id="meaningPrompt"></div>
+    <div class="meaning-section-label">// タグを選ぶ（複数可・任意）</div>
+    <div class="meaning-tag-row" id="meaningTagRow"></div>
+    <div class="meaning-section-label">// ひとこと（任意）</div>
+    <textarea class="meaning-note-input" id="meaningNoteInput" rows="2" placeholder="空欄でもOK"></textarea>
+    <div class="meaning-nav">
+      <button class="meaning-skip-btn" onclick="saveMeaning(true)">今は入力しない</button>
+      <button class="meaning-save-btn" onclick="saveMeaning(false)">保存する</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm Dialog -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
@@ -435,6 +522,19 @@ const FEELINGS = [
 ];
 
 const DEFAULT_CONTEXTS = ['会議中','対話中','移動中','データを見て','現場で','メールのやりとり','ふとした瞬間','なんとなく'];
+
+const MEANING_TAGS_CONFIRMED = [
+  '過去の知見が生きた', '過去の経験通りだった',
+  '相手の状態を読んでいた', '場の空気を感じていた',
+  '数値の異常を先に感じていた', '情報のズレを検知していた',
+  '前提が違った', '別の文脈と混同していた',
+  'その他',
+];
+const MEANING_TAGS_MISSED = [
+  '思い込みだった', '過剰反応だった',
+  '別の要因だった', 'タイミングが早すぎた',
+  '情報が足りなかった', 'その他',
+];
 
 const SAMPLE_LOGS = [
   {id:'s1',feel:{e:'⚡',label:'ざわっと'},context:'会議中',note:'話がかみ合っていない気がした',time:new Date(Date.now()-2*86400000),result:'confirmed'},
@@ -472,6 +572,7 @@ let profile = loadProfile();
 let logs = loadLogs() || [...SAMPLE_LOGS];
 let customContexts = loadContexts();
 let draft = {feel:null, context:null, note:''};
+let meaningDraft = {id: null, result: null, tags: [], note: ''};
 let nextId = Date.now();
 let confirmCallback = null;
 
@@ -629,11 +730,73 @@ function showToast(msg) {
 
 function setResult(id, result) {
   const log = logs.find(l => String(l.id) === String(id));
-  if (log) {
-    log.result = log.result === result ? 'pending' : result;
+  if (!log) return;
+  // 同じボタンを再度押したらpendingに戻す（meaning もクリア）
+  if (log.result === result) {
+    log.result = 'pending';
+    log.meaning = null;
     saveLogs();
     renderLogs();
+    return;
   }
+  // 結果を確定する前にmeaning modalを開く
+  openMeaningModal(id, result);
+}
+
+// ── Meaning Modal ──
+function openMeaningModal(id, result) {
+  meaningDraft = {id, result, tags: [], note: ''};
+  const isGood = result === 'confirmed';
+
+  const titleEl = document.getElementById('meaningTitle');
+  titleEl.textContent = isGood ? '🫀 腸が正しかった' : 'なぜ外れたか';
+  titleEl.className = `meaning-title ${isGood ? 'good' : 'bad'}`;
+
+  document.getElementById('meaningPrompt').textContent = isGood
+    ? 'なぜ当たったか、思い当たることはありますか？（任意）'
+    : 'なぜ外れたか、思い当たることはありますか？（任意）';
+
+  const tags = isGood ? MEANING_TAGS_CONFIRMED : MEANING_TAGS_MISSED;
+  const row = document.getElementById('meaningTagRow');
+  row.innerHTML = '';
+  tags.forEach(tag => {
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.textContent = tag;
+    chip.onclick = () => {
+      chip.classList.toggle('selected');
+      if (chip.classList.contains('selected')) {
+        if (!meaningDraft.tags.includes(tag)) meaningDraft.tags.push(tag);
+      } else {
+        meaningDraft.tags = meaningDraft.tags.filter(t => t !== tag);
+      }
+    };
+    row.appendChild(chip);
+  });
+
+  document.getElementById('meaningNoteInput').value = '';
+  document.getElementById('meaningOverlay').classList.add('active');
+
+  if (isGood) showToast('🫀 腸が正しかった');
+}
+
+function closeMeaningModal() {
+  document.getElementById('meaningOverlay').classList.remove('active');
+}
+
+function saveMeaning(skip) {
+  const log = logs.find(l => String(l.id) === String(meaningDraft.id));
+  if (!log) { closeMeaningModal(); return; }
+
+  log.result = meaningDraft.result;
+  log.meaning = skip ? null : {
+    tags: [...meaningDraft.tags],
+    note: document.getElementById('meaningNoteInput').value.trim()
+  };
+
+  saveLogs();
+  closeMeaningModal();
+  renderLogs();
 }
 
 function deleteLog(id) {
@@ -692,7 +855,12 @@ function renderLogs() {
         <span class="result-label">その予感は？</span>
         <button class="result-btn good ${log.result==='confirmed'?'active':''}" onclick="setResult('${log.id}','confirmed')">当たった</button>
         <button class="result-btn bad ${log.result==='missed'?'active':''}" onclick="setResult('${log.id}','missed')">外れた</button>
-      </div>`;
+      </div>
+      ${(log.meaning && (log.meaning.tags.length > 0 || log.meaning.note)) ? `
+        <div class="meaning-row">
+          ${log.meaning.tags.map(t => `<span class="meaning-chip-display">${t}</span>`).join('')}
+          ${log.meaning.note ? `<span class="meaning-note-display">"${log.meaning.note}"</span>` : ''}
+        </div>` : ''}`;
     list.appendChild(card);
   });
 }
