@@ -505,25 +505,33 @@ const KNOWLEDGE = [
 
 // ── Retrieval function ─────────────────────────────
 /**
- * Socraticのカテゴリに基づいて知識文書を取得
+ * 思想の筋に沿って知識文書を取得
+ * 各層（般若心経・哲学・神経科学・身体知）から必ず1件確保する
  * @param {string} cat - 'hito' | 'basho' | 'mono' | 'kokoro'
- * @returns {string} プロンプト注入用テキスト
  */
 function buildKnowledgeContext(cat) {
-  // 常に含めるコア文書
-  const coreIds = ['kotoba-011', 'kotoba-005', 'nou-007'];
+  // ── 思想の筋：各層から代表1件を必ず確保 ──
+  const lineage = [
+    KNOWLEDGE.find(d => d.id === 'hannya-001'),     // 般若心経層：五蘊
+    KNOWLEDGE.find(d => d.id === 'tetsugaku-001'),  // 哲学層：メルロ＝ポンティ
+    KNOWLEDGE.find(d => d.id === 'nou-007'),         // 神経科学層：3層構造
+    KNOWLEDGE.find(d => d.id === 'kotoba-011'),      // 身体知層：腸で考える
+  ].filter(Boolean);
 
-  // カテゴリに関連する文書（coreを除く）
+  const lineageIds = lineage.map(d => d.id);
+
+  // ── カテゴリ固有の文書（lineage以外・strictly catに一致）──
   const catDocs = KNOWLEDGE
-    .filter(d => !coreIds.includes(d.id))
-    .filter(d => d.socratic.includes(cat) || d.socratic.includes('all'))
-    .slice(0, 4);
+    .filter(d => !lineageIds.includes(d.id))
+    .filter(d => d.socratic.includes(cat))
+    .slice(0, 3);
 
-  const coreDocs = KNOWLEDGE.filter(d => coreIds.includes(d.id));
-  const selected = [...coreDocs, ...catDocs];
-
+  const selected = [...lineage, ...catDocs];
   if (!selected.length) return '';
 
-  const lines = selected.map(d => `・${d.title}：${d.summary}`);
-  return `\n【身体知・哲学の背景知識】\n${lines.join('\n')}\n`;
+  const lines = selected.map(d =>
+    `・${d.title}（${d.category}）：${d.summary}`
+  );
+
+  return `\n【思想の筋：般若心経→哲学→神経科学→身体知】\n${lines.join('\n')}\n`;
 }
