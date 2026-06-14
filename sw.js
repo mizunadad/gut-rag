@@ -1,4 +1,4 @@
-const CACHE = 'gut-rag-v3';
+const CACHE = 'gut-rag-v4';
 const FILES = [
   '/gut-rag/',
   '/gut-rag/index.html',
@@ -6,6 +6,7 @@ const FILES = [
   '/gut-rag/gut-brain-map.html',
   '/gut-rag/gut-socratic.html',
   '/gut-rag/gut-rag-graph-v2.html',
+  '/gut-rag/knowledge.js',
   '/gut-rag/manifest.json',
 ];
 
@@ -24,19 +25,20 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // HTMLは常にネットワーク優先（キャッシュは古くなるため）
-  if (e.request.destination === 'document') {
+  // HTML・JSは常にネットワーク優先
+  if (e.request.destination === 'document' ||
+      e.request.destination === 'script') {
     e.respondWith(
       fetch(e.request)
         .then(r => {
           caches.open(CACHE).then(c => c.put(e.request, r.clone()));
           return r;
         })
-        .catch(() => caches.match(e.request)) // オフライン時のみキャッシュ
+        .catch(() => caches.match(e.request))
     );
     return;
   }
-  // その他（manifest等）はキャッシュ優先
+  // その他はキャッシュ優先
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request))
   );

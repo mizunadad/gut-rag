@@ -559,6 +559,7 @@
   API key —
 </div>
 
+<script src="knowledge.js"></script>
 <script>
 // ── Data ──
 const EMOJIS = {
@@ -828,9 +829,12 @@ async function goDeep() {
   document.getElementById('expBadge').style.display = 'none';
   go(4);
 
-  // 経験文書を取得してプロンプトに注入
+  // 経験文書・知識文書を取得してプロンプトに注入
   const exp = retrieveExperienceDocs();
   const expContext = buildExpContext(exp);
+  const knowContext = (typeof buildKnowledgeContext === 'function')
+    ? buildKnowledgeContext(state.cat) : '';
+
   if (exp && exp.decided >= 2) {
     const badge = document.getElementById('expBadge');
     badge.textContent = `🫀 過去${exp.total}件の記録を参照 — 当たり率 ${exp.rate}%`;
@@ -845,7 +849,7 @@ async function goDeep() {
 - カテゴリ：${catNames[state.cat]}
 - 選んだ絵文字：${state.emoji.e}（${state.emoji.label}）
 - 感じていること：${state.choice}
-${expContext}
+${knowContext}${expContext}
 以下の形式で日本語で返してください：
 
 【気づき】
