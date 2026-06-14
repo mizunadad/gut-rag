@@ -2,38 +2,179 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f59e0b">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>腸で考えるRAG</title>
 <style>
-  body { background:#08090f; color:#e2e8f5; font-family:'Hiragino Sans',sans-serif; font-weight:300; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; margin:0; gap:0; }
-  h1 { font-size:2rem; font-weight:300; margin-bottom:12px; letter-spacing:0.05em; }
-  p { color:#7c8db0; font-size:13px; margin-bottom:48px; text-align:center; line-height:1.9; }
-  .links { display:flex; flex-direction:column; gap:12px; width:100%; max-width:360px; }
-  a { display:block; padding:16px 24px; border:1px solid #1c1e2e; border-radius:12px; color:#e2e8f5; text-decoration:none; transition:all 0.2s; }
-  a:hover { border-color:#f59e0b; color:#f59e0b; }
-  .sub { font-size:11px; color:#3a4260; margin-top:4px; }
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400&family=Noto+Sans+JP:wght@300;400&family=DM+Mono:wght@300;400&display=swap');
+
+  :root {
+    --bg:          #08090f;
+    --surface:     #0f1018;
+    --surface2:    #14151f;
+    --border:      #1c1e2e;
+    --border2:     #252838;
+    --text:        #e2e8f5;
+    --text2:       #7c8db0;
+    --text3:       #3a4260;
+    --signal:      #f59e0b;
+    --signal-glow: rgba(245,158,11,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px 64px;
+  }
+
+  /* ── header ── */
+  .header {
+    text-align: center;
+    padding: 64px 0 48px;
+  }
+  .title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.9;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── sections ── */
+  .section {
+    width: 100%;
+    max-width: 460px;
+    margin-bottom: 36px;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 2px;
+  }
+
+  /* ── primary cards ── */
+  .primary-card {
+    display: block;
+    padding: 20px 22px;
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: all 0.22s;
+  }
+  .primary-card:hover {
+    border-color: var(--signal);
+    box-shadow: 0 0 24px var(--signal-glow);
+  }
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .card-emoji { font-size: 1.4rem; }
+  .card-name {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.8;
+  }
+
+  /* ── reference cards ── */
+  .ref-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .ref-card {
+    display: block;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface2);
+    color: var(--text2);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .ref-card:hover { border-color: var(--border2); color: var(--text); }
+  .ref-emoji { font-size: 1.1rem; margin-bottom: 8px; display: block; }
+  .ref-name { font-size: 12px; margin-bottom: 4px; color: var(--text2); }
+  .ref-sub  { font-size: 10px; color: var(--text3); line-height: 1.6; }
 </style>
 </head>
 <body>
-  <h1>腸で考えるRAG</h1>
-  <p>言語化できない身体知を、記録・蒸留・継承する。</p>
-  <div class="links">
-    <a href="gut-logger-v2.html">
-      🫀 腸の記録（gut-logger）
-      <div class="sub">「なんか」をその場で残す</div>
+
+<div class="header">
+  <div class="title">腸で考えるRAG</div>
+  <div class="subtitle">言語化できない身体知を、記録・蒸留・継承する。</div>
+</div>
+
+<div class="section">
+  <div class="section-label">// 使う</div>
+
+  <a class="primary-card" href="gut-socratic.html">
+    <div class="card-top">
+      <span class="card-emoji">✨</span>
+      <div class="card-name">Socratic Explorer</div>
+    </div>
+    <div class="card-desc">
+      今ある感覚を、問いと対話で言葉に近づける。<br>
+      APIキーがあればすぐに使える。
+    </div>
+  </a>
+
+  <a class="primary-card" href="gut-logger-v2.html">
+    <div class="card-top">
+      <span class="card-emoji">🫀</span>
+      <div class="card-name">腸の記録</div>
+    </div>
+    <div class="card-desc">
+      「なんか」をその場で残す。<br>
+      記録が増えると、Socraticの応答が育つ。
+    </div>
+  </a>
+</div>
+
+<div class="section">
+  <div class="section-label">// 知る</div>
+  <div class="ref-row">
+    <a class="ref-card" href="gut-brain-map.html">
+      <span class="ref-emoji">🧠</span>
+      <div class="ref-name">身体知マップ</div>
+      <div class="ref-sub">10の言葉と神経科学</div>
     </a>
-    <a href="gut-brain-map.html">
-      🧠 身体知と脳機能の地図
-      <div class="sub">10の言葉と神経科学</div>
-    </a>
-    <a href="gut-socratic.html">
-      ✨ Socratic Explorer
-      <div class="sub">感覚を言葉に近づける問い</div>
-    </a>
-    <a href="gut-rag-graph-v2.html">
-      🕸️ 完全構造図
-      <div class="sub">般若心経 × 哲学 × RAG</div>
+    <a class="ref-card" href="gut-rag-graph-v2.html">
+      <span class="ref-emoji">🕸️</span>
+      <div class="ref-name">完全構造図</div>
+      <div class="ref-sub">般若心経 × 哲学 × RAG</div>
     </a>
   </div>
+</div>
+
 </body>
 </html>
