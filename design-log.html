@@ -290,11 +290,32 @@
     </div>
   </section>
 
+  <hr class="divider">
+
+  <section>
+    <div class="sec-label">// 07 — 造語・新概念</div>
+    <h2>このプロジェクトで生まれた言葉</h2>
+    <div class="card">
+      <div class="card-title">lineage retrieval（リネージ・リトリーバル）</div>
+      <div class="card-body">
+        <strong>定義：</strong>思想の継承の連鎖（lineage）に沿って文書を取得するRAGの手法。クエリとの類似度ではなく、設計者が定めた知的系譜の構造に基づいて文書を選択・注入する。<br><br>
+        <strong>既存手法との違い：</strong><br>
+        ・vector similarity search：クエリとの意味的近さで取得<br>
+        ・keyword retrieval：キーワード一致で取得<br>
+        ・lineage retrieval：知的継承の連鎖の各層を代表する文書を取得<br><br>
+        <strong>このプロジェクトでの実装：</strong><br>
+        般若心経（hannya-001）→ 哲学（tetsugaku-001）→ 神経科学（nou-007）→ 身体知（kotoba-011）の4層から必ず1件ずつ取得し、Socraticのプロンプトに注入する。<br><br>
+        <strong>なぜこの名前か：</strong><br>
+        身体知は言語化の「前」に存在するため、意味の空間（ベクトル空間）での類似検索とは構造的に不一致。思想の筋は類似度ではなく継承の順序であり、その継承（lineage）に沿って取得することが設計思想と一致する。既存の技術用語では表現できないため、このプロジェクトで命名した。
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <div class="footer">
   gut-rag design journal — updated in session<br>
-  言語化できない身体知を、記録・蒸留・継承する
+  腸で感じた直感を、記録し、問いを通じて言語化する
 </div>
 
 </body>
