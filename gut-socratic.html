@@ -353,6 +353,84 @@
   }
   .pdot.active { background: var(--text2); }
   .pdot.done   { background: var(--text3); }
+
+  /* ── API key modal ── */
+  .apikey-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5,6,10,0.88); backdrop-filter: blur(10px);
+    display: none; align-items: flex-end; justify-content: center; z-index: 200;
+  }
+  .apikey-overlay.active { display: flex; }
+  .apikey-modal {
+    width: 100%; max-width: 520px;
+    background: #0f1018; border: 1px solid #252838;
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 40px;
+    animation: slideUp 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .apikey-handle {
+    width: 36px; height: 4px; background: #252838;
+    border-radius: 2px; margin: 0 auto 20px;
+  }
+  .apikey-title {
+    font-family: 'Noto Serif JP', serif; font-size: 1.05rem;
+    margin-bottom: 6px; color: #e2e8f5;
+  }
+  .apikey-sub {
+    font-size: 12px; color: #7c8db0; line-height: 1.8;
+    margin-bottom: 20px;
+  }
+  .apikey-input {
+    width: 100%; padding: 13px 16px; border-radius: 10px;
+    border: 1px solid #1c1e2e; background: #14151f;
+    color: #e2e8f5; font-family: 'DM Mono', monospace; font-size: 13px;
+    outline: none; transition: border 0.2s; margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+  .apikey-input:focus { border-color: #f59e0b; }
+  .apikey-input::placeholder { color: #3a4260; letter-spacing: 0; }
+  .apikey-note {
+    font-size: 11px; color: #3a4260; margin-bottom: 20px; line-height: 1.7;
+  }
+  .apikey-btns { display: flex; gap: 8px; }
+  .apikey-cancel {
+    flex: 1; padding: 13px; border-radius: 10px;
+    border: 1px solid #1c1e2e; background: transparent;
+    color: #7c8db0; font-size: 13px; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; transition: all 0.2s;
+  }
+  .apikey-cancel:hover { border-color: #252838; color: #e2e8f5; }
+  .apikey-save {
+    flex: 2; padding: 13px; border-radius: 10px;
+    border: 1px solid #f59e0b; background: #f59e0b;
+    color: #1a1206; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: 'Noto Sans JP', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .apikey-save:disabled { opacity: 0.3; cursor: not-allowed; }
+  .apikey-save:not(:disabled):hover { opacity: 0.88; }
+
+  /* ── API key indicator ── */
+  .apikey-indicator {
+    position: fixed; bottom: 16px; right: 16px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    padding: 5px 10px; border-radius: 12px;
+    border: 1px solid #1c1e2e; background: #0f1018;
+    color: #3a4260; cursor: pointer; transition: all 0.2s;
+    z-index: 50;
+  }
+  .apikey-indicator:hover { border-color: #252838; color: #7c8db0; }
+  .apikey-indicator.set { color: #34d399; border-color: rgba(52,211,153,0.3); }
+
+  /* ── exp context badge on s4 ── */
+  .exp-badge {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    padding: 4px 10px; border-radius: 10px;
+    border: 1px solid rgba(245,158,11,0.25);
+    color: rgba(245,158,11,0.7); background: rgba(245,158,11,0.06);
+    display: inline-block; margin-bottom: 16px;
+  }
 </style>
 </head>
 <body>
@@ -444,6 +522,7 @@
     <div class="response-orb" id="responseOrb"></div>
     <div class="response-title">腸からの言葉</div>
   </div>
+  <div class="exp-badge" id="expBadge" style="display:none"></div>
   <div class="response-body loading" id="responseBody">考えています...</div>
   <hr class="response-divider" id="responseDivider" style="display:none">
   <div class="next-q-label" id="nextQLabel" style="display:none">次の問い</div>
@@ -453,50 +532,91 @@
   </button>
 </div>
 
+<!-- API Key Modal -->
+<div class="apikey-overlay" id="apikeyOverlay">
+  <div class="apikey-modal">
+    <div class="apikey-handle"></div>
+    <div class="apikey-title">Anthropic APIキーを入力</div>
+    <div class="apikey-sub">
+      「もっと深く探る」はAnthropicのAPIを使用します。<br>
+      APIキーはご自身でご用意・ご管理ください。
+    </div>
+    <input class="apikey-input" id="apikeyInput" type="password"
+      placeholder="sk-ant-..." oninput="checkApikeyInput()">
+    <div class="apikey-note">
+      このデバイスのlocalStorageにのみ保存されます。<br>
+      送信されるのは感覚・文脈・パターンの情報のみです。
+    </div>
+    <div class="apikey-btns">
+      <button class="apikey-cancel" onclick="closeApikeyModal()">キャンセル</button>
+      <button class="apikey-save" id="apikeySaveBtn" disabled onclick="saveApikeyAndContinue()">保存して続ける</button>
+    </div>
+  </div>
+</div>
+
+<!-- API key indicator -->
+<div class="apikey-indicator" id="apikeyIndicator" onclick="openApikeyModal(false)">
+  API key —
+</div>
+
 <script>
 // ── Data ──
 const EMOJIS = {
   hito: [
-    { e:'👵', label:'祖父母' },
-    { e:'👫', label:'旧友' },
-    { e:'🧑‍🏫', label:'恩師' },
-    { e:'👶', label:'子供' },
-    { e:'🤝', label:'初対面の人' },
-    { e:'🧘', label:'自分自身' },
-    { e:'💼', label:'仕事の誰か' },
-    { e:'❓', label:'なんとなく' },
+    { e:'💑',          label:'パートナー/恋人' },
+    { e:'👨‍👩‍👧‍👦',  label:'家族' },
+    { e:'🧘',          label:'自分自身' },
+    { e:'🫂',          label:'旧友' },
+    { e:'👥',          label:'同僚' },
+    { e:'👔',          label:'上司/部下' },
+    { e:'💼',          label:'仕事の誰か' },
+    { e:'🤝',          label:'取引相手' },
+    { e:'🧑‍🏫',       label:'恩師/教え子' },
+    { e:'🚶',          label:'通りすがりの人' },
+    { e:'👤',          label:'その他' },
+    { e:'❓',          label:'なんとなく' },
   ],
   basho: [
-    { e:'🏔️', label:'山' },
-    { e:'🌊', label:'海' },
-    { e:'🏠', label:'実家' },
-    { e:'☕', label:'いつもの店' },
-    { e:'🌳', label:'自然・公園' },
-    { e:'🏙️', label:'都市の夜' },
+    { e:'🌿',  label:'自然(山・海・公園など)' },
+    { e:'🏠',  label:'家' },
+    { e:'🏙️', label:'都市' },
+    { e:'🚃',  label:'乗り物内(電車・車など)' },
+    { e:'🏢',  label:'仕事場/学校' },
+    { e:'🗺️', label:'旅行先' },
+    { e:'☕',  label:'いつもの店' },
     { e:'⛩️', label:'静かな場所' },
-    { e:'❓', label:'なんとなく' },
+    { e:'🌌',  label:'宇宙' },
+    { e:'🔮',  label:'空想の世界' },
+    { e:'📍',  label:'その他' },
+    { e:'❓',  label:'なんとなく' },
   ],
   mono: [
-    { e:'🎵', label:'音楽' },
-    { e:'📖', label:'本' },
-    { e:'🍳', label:'食・料理' },
-    { e:'⚙️', label:'道具' },
-    { e:'🌅', label:'景色・光' },
-    { e:'🎞️', label:'思い出' },
     { e:'🖊️', label:'言葉' },
-    { e:'❓', label:'なんとなく' },
+    { e:'🎞️', label:'思い出' },
+    { e:'🍳',  label:'食・料理' },
+    { e:'⚙️', label:'道具' },
+    { e:'📖',  label:'本' },
+    { e:'🌅',  label:'景色・光' },
+    { e:'🎵',  label:'音楽/芸術' },
+    { e:'🐾',  label:'動植物' },
+    { e:'📱',  label:'スマホ' },
+    { e:'📡',  label:'情報' },
+    { e:'💡',  label:'その他' },
+    { e:'❓',  label:'なんとなく' },
   ],
   kokoro: [
-    { e:'😌', label:'穏やか' },
-    { e:'🌀', label:'モヤモヤ' },
-    { e:'⚡', label:'ざわざわ' },
+    { e:'😌',  label:'穏やか' },
+    { e:'🌀',  label:'モヤモヤ' },
+    { e:'⚡',  label:'ざわざわ' },
     { e:'🌧️', label:'重い' },
-    { e:'✨', label:'ワクワク' },
-    { e:'🔥', label:'熱い' },
-    { e:'😶', label:'空っぽ' },
+    { e:'✨',  label:'ワクワク' },
+    { e:'🔥',  label:'熱い' },
+    { e:'😶',  label:'空っぽ' },
     { e:'🌫️', label:'ぼんやり' },
-    { e:'😢', label:'泣きたい' },
-    { e:'😤', label:'うまく言えない' },
+    { e:'😢',  label:'泣きたい' },
+    { e:'😤',  label:'うまく言えない' },
+    { e:'💕',  label:'トキメキ' },
+    { e:'🌙',  label:'切ない' },
   ],
 };
 
@@ -521,6 +641,103 @@ const QUESTIONS = {
 
 // ── State ──
 let state = { cat: null, emoji: null, choice: null };
+let _pendingDeep = false; // APIキー入力後にgoDeepを再実行するフラグ
+
+// ── API Key ──
+function getApiKey() {
+  return localStorage.getItem('gut_api_key') || '';
+}
+function saveApiKey(key) {
+  localStorage.setItem('gut_api_key', key.trim());
+  updateApikeyIndicator();
+}
+function updateApikeyIndicator() {
+  const el = document.getElementById('apikeyIndicator');
+  if (getApiKey()) {
+    el.textContent = 'API key ✓';
+    el.classList.add('set');
+  } else {
+    el.textContent = 'API key —';
+    el.classList.remove('set');
+  }
+}
+function openApikeyModal(fromDeep) {
+  _pendingDeep = !!fromDeep;
+  document.getElementById('apikeyInput').value = getApiKey();
+  checkApikeyInput();
+  document.getElementById('apikeyOverlay').classList.add('active');
+}
+function closeApikeyModal() {
+  document.getElementById('apikeyOverlay').classList.remove('active');
+  _pendingDeep = false;
+}
+function checkApikeyInput() {
+  const val = document.getElementById('apikeyInput').value.trim();
+  document.getElementById('apikeySaveBtn').disabled = val.length < 10;
+}
+function saveApikeyAndContinue() {
+  const val = document.getElementById('apikeyInput').value.trim();
+  saveApiKey(val);
+  document.getElementById('apikeyOverlay').classList.remove('active');
+  if (_pendingDeep) { _pendingDeep = false; goDeep(); }
+}
+
+// ── Experience docs retrieval（自由入力テキストは除外）──
+function retrieveExperienceDocs() {
+  try {
+    const raw = localStorage.getItem('gut_logs');
+    if (!raw) return null;
+    const logs = JSON.parse(raw);
+    if (!logs || logs.length === 0) return null;
+
+    const decided  = logs.filter(l => l.result !== 'pending');
+    const confirmed = decided.filter(l => l.result === 'confirmed');
+    if (decided.length === 0) return null;
+
+    const rate = Math.round(confirmed.length / decided.length * 100);
+
+    // meaningタグの集計（選択肢タグのみ・自由入力テキストは含めない）
+    const tagCounts = {};
+    confirmed.forEach(l => {
+      if (l.meaning && Array.isArray(l.meaning.tags)) {
+        l.meaning.tags.forEach(t => {
+          if (t !== 'その他') tagCounts[t] = (tagCounts[t] || 0) + 1;
+        });
+      }
+    });
+    const topTags = Object.entries(tagCounts)
+      .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([t]) => t);
+
+    // 文脈ラベルの集計
+    const ctxCounts = {};
+    logs.forEach(l => { ctxCounts[l.context] = (ctxCounts[l.context] || 0) + 1; });
+    const topContexts = Object.entries(ctxCounts)
+      .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([c]) => c);
+
+    // 感覚ラベルの集計
+    const feelCounts = {};
+    confirmed.forEach(l => {
+      feelCounts[l.feel.label] = (feelCounts[l.feel.label] || 0) + 1;
+    });
+    const topFeels = Object.entries(feelCounts)
+      .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([f]) => f);
+
+    return { total: logs.length, decided: decided.length, rate, topTags, topContexts, topFeels };
+  } catch { return null; }
+}
+
+function buildExpContext(exp) {
+  if (!exp || exp.decided < 2) return '';
+  const lines = [
+    `【あなた自身の直感パターン（これまでの記録より）】`,
+    `・記録数：${exp.total}件　判定済み：${exp.decided}件　当たり率：${exp.rate}%`,
+  ];
+  if (exp.topContexts.length) lines.push(`・よく感じる場面：${exp.topContexts.join('・')}`);
+  if (exp.topFeels.length)    lines.push(`・当たった時の感覚：${exp.topFeels.join('・')}`);
+  if (exp.topTags.length)     lines.push(`・当たった時の傾向：${exp.topTags.join('・')}`);
+  lines.push(`（この情報はAnthropicのAPIに送信されます。テキストメモは含まれません。）`);
+  return '\n' + lines.join('\n') + '\n';
+}
 
 // ── Navigation ──
 function go(n) {
@@ -597,6 +814,9 @@ function selectChoice(choice, btn, cat) {
 
 // ── Go deep: call LLM ──
 async function goDeep() {
+  // APIキー未設定ならモーダルを出して中断
+  if (!getApiKey()) { openApikeyModal(true); return; }
+
   const catNames = { hito:'人', basho:'場所', mono:'もの', kokoro:'ココロ' };
   document.getElementById('responseOrb').className = `response-orb ${state.cat}`;
   document.getElementById('responseBody').textContent = '考えています...';
@@ -605,7 +825,17 @@ async function goDeep() {
   document.getElementById('nextQLabel').style.display = 'none';
   document.getElementById('nextQBox').style.display = 'none';
   document.getElementById('restartBtn').style.display = 'none';
+  document.getElementById('expBadge').style.display = 'none';
   go(4);
+
+  // 経験文書を取得してプロンプトに注入
+  const exp = retrieveExperienceDocs();
+  const expContext = buildExpContext(exp);
+  if (exp && exp.decided >= 2) {
+    const badge = document.getElementById('expBadge');
+    badge.textContent = `🫀 過去${exp.total}件の記録を参照 — 当たり率 ${exp.rate}%`;
+    badge.style.display = 'inline-block';
+  }
 
   const prompt = `あなたは「腸で考える」という概念を体現したSocraticコーチです。
 身体知・現象学・仏教の五蘊・神経科学（島皮質・扁桃体・腸神経系）を背景に持ちながら、
@@ -615,11 +845,11 @@ async function goDeep() {
 - カテゴリ：${catNames[state.cat]}
 - 選んだ絵文字：${state.emoji.e}（${state.emoji.label}）
 - 感じていること：${state.choice}
-
+${expContext}
 以下の形式で日本語で返してください：
 
 【気づき】
-（3〜4文。ユーザーの選択から見えてくる身体知・感覚の正体を、神経科学や哲学・仏教を自然に織り交ぜながら、詩的に言語化する。難しい言葉は使わない。）
+（3〜4文。ユーザーの選択から見えてくる身体知・感覚の正体を、神経科学や哲学・仏教を自然に織り交ぜながら、詩的に言語化する。難しい言葉は使わない。${exp && exp.decided >= 2 ? 'ユーザーの過去の直感パターンが関連する場合は自然に織り込む。' : ''}）
 
 【次の問い】
 （1文。答えを求めず、さらに深い感覚へ誘う問い。）
@@ -629,22 +859,35 @@ async function goDeep() {
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': getApiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
     const data = await res.json();
+
+    if (data.error) {
+      const msg = data.error.type === 'authentication_error'
+        ? 'APIキーが正しくありません。右下のボタンから再設定してください。'
+        : 'うまく繋がれませんでした。もう一度試してみてください。';
+      document.getElementById('responseBody').textContent = msg;
+      document.getElementById('responseBody').className = 'response-body';
+      document.getElementById('restartBtn').style.display = 'block';
+      return;
+    }
+
     const text = data.content.map(b => b.text || '').join('');
-
-    // parse
     const kidzukiMatch = text.match(/【気づき】\s*([\s\S]*?)(?=【次の問い】|$)/);
-    const nextMatch = text.match(/【次の問い】\s*([\s\S]*?)$/);
-
+    const nextMatch    = text.match(/【次の問い】\s*([\s\S]*?)$/);
     const kidzuki = kidzukiMatch ? kidzukiMatch[1].trim() : text;
-    const nextQ = nextMatch ? nextMatch[1].trim() : '';
+    const nextQ   = nextMatch   ? nextMatch[1].trim()    : '';
 
     document.getElementById('responseBody').textContent = kidzuki;
     document.getElementById('responseBody').className = 'response-body';
@@ -668,6 +911,9 @@ function restart() {
   state = { cat: null, emoji: null, choice: null };
   go(0);
 }
+
+// ── Init ──
+updateApikeyIndicator();
 </script>
 </body>
 </html>
