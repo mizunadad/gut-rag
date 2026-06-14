@@ -25,6 +25,13 @@
 
 https://mizunadad.github.io/gut-rag/
 
+## データの取り扱い
+
+- 記録はすべてブラウザのlocalStorageに保存されます（端末外に出ません）
+- 「もっと深く探る」機能はAnthropicのAPIを使用します
+- APIキーは使用者ご自身でご用意・ご管理ください
+- APIに送信されるのは感覚・文脈・パターンの情報のみです
+
 ## License
 
 MIT
