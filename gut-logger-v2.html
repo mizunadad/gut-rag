@@ -391,6 +391,44 @@
     width: 100%; font-size: 11px; color: var(--text2);
     font-style: italic; line-height: 1.6; margin-top: 2px;
   }
+
+  /* ── Socratic ナッジ（前回の問い）バナー ── */
+  .socratic-nudge {
+    display: none;
+    margin: 12px 0 4px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(167,139,250,0.25);
+    background: rgba(167,139,250,0.05);
+    position: relative;
+  }
+  .nudge-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    color: rgba(167,139,250,0.6);
+    text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nudge-kai {
+    font-size: 10px; padding: 1px 7px;
+    border-radius: 8px;
+    border: 1px solid rgba(167,139,250,0.3);
+    color: rgba(167,139,250,0.7);
+    font-family: 'DM Mono', monospace;
+  }
+  .nudge-q {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.95rem; font-weight: 300;
+    line-height: 1.8; color: var(--text);
+  }
+  .nudge-close {
+    position: absolute; top: 10px; right: 12px;
+    background: transparent; border: none;
+    color: var(--text3); font-size: 14px;
+    cursor: pointer; line-height: 1;
+    padding: 4px;
+  }
+  .nudge-close:hover { color: var(--text2); }
 </style>
 </head>
 <body>
@@ -399,6 +437,17 @@
     <div class="top-title"><span class="pulse"></span>腸の記録</div>
     <div class="top-role" id="roleLabel" onclick="editProfile()">—</div>
   </div>
+
+  <!-- Socratic ナッジ（前回の問い）-->
+  <div class="socratic-nudge" id="socraticNudge">
+    <div class="nudge-label">
+      <span>腸で考えるより</span>
+      <span class="nudge-kai" id="nudgeKai"></span>
+    </div>
+    <div class="nudge-q" id="nudgeQ"></div>
+    <button class="nudge-close" onclick="dismissNudge()" title="閉じる">✕</button>
+  </div>
+
   <div class="tabs">
     <button class="tab active" onclick="switchTab('log',this)">記録</button>
     <button class="tab" onclick="switchTab('pattern',this)">パターン</button>
@@ -989,7 +1038,41 @@ if ('serviceWorker' in navigator) {
     .catch(e => console.error(e));
 }
 
+// ── Socratic ナッジ（D案v2）──
+const KAI_LABEL = { 根: '根 — 身体への問い', 境: '境 — 対象への問い', 識: '識 — 認識への問い' };
+
+function loadSocraticNudge() {
+  try {
+    const raw = localStorage.getItem('gut_next_q');
+    if (!raw) return;
+    const { q, kai, ts } = JSON.parse(raw);
+    if (!q) return;
+
+    // 48時間以上前の問いは表示しない
+    if (Date.now() - ts > 48 * 60 * 60 * 1000) {
+      localStorage.removeItem('gut_next_q');
+      return;
+    }
+
+    document.getElementById('nudgeQ').textContent = q;
+    const kaiEl = document.getElementById('nudgeKai');
+    if (kai && KAI_LABEL[kai]) {
+      kaiEl.textContent = KAI_LABEL[kai];
+      kaiEl.style.display = 'inline-block';
+    } else {
+      kaiEl.style.display = 'none';
+    }
+    document.getElementById('socraticNudge').style.display = 'block';
+  } catch(_) {}
+}
+
+function dismissNudge() {
+  document.getElementById('socraticNudge').style.display = 'none';
+  try { localStorage.removeItem('gut_next_q'); } catch(_) {}
+}
+
 renderLogs();
+loadSocraticNudge();
 </script>
 </body>
 </html>

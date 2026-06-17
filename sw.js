@@ -1,4 +1,4 @@
-const CACHE = 'gut-rag-v5';
+const CACHE = 'gut-rag-v6';
 const FILES = [
   '/gut-rag/',
   '/gut-rag/index.html',
@@ -7,6 +7,8 @@ const FILES = [
   '/gut-rag/gut-socratic.html',
   '/gut-rag/gut-rag-graph-v2.html',
   '/gut-rag/knowledge.js',
+  '/gut-rag/demo_responses.js',
+  '/gut-rag/design-log.html',
   '/gut-rag/manifest.json',
 ];
 

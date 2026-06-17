@@ -40,9 +40,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '「わかりました」が腑に落ちていない時は、問いを身体に向ける。「どこかに引っかかりはありますか？」',
       ready: '「腑に落ちた」と感じている時、その確信を一言で言語化させる。言葉になった瞬間が前進のタイミング。'
-    },
-    plain_insight: '「そうか、そういうことか」と体の中で何かが解ける感じ。頭だけでなく、腹も同意した瞬間のこと。',
-    resonance_question: '最近の記録に、後から「そういうことだったのか」と気づいた場面はありましたか？',
+    }
   },
 
   {
@@ -59,9 +57,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '直感が鈍い時は経験の蓄積不足か、ノイズが多い状態。まず記録から始める。',
       ready: '直感が冴えている時は、その根拠を問わず動いていい。記録だけ残す。'
-    },
-    plain_insight: '経験が何年もかけて体に蓄積され、必要な時に一瞬で出てくる知恵。「なぜそう思ったか」は後から言語化できる。',
-    resonance_question: '記録を振り返ると、「なぜかそう思った」が当たっていた場面はどれですか？',
+    }
   },
 
   {
@@ -78,9 +74,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '気配が読めない時は頭で考えすぎている。まず身体の反応を先に聴く。',
       ready: '気配を読んでいる時、その感覚を言葉にせず行動に移せるかが問われる。'
-    },
-    plain_insight: '言葉より先に、空間の変化を体が受け取っている。「今日なんか違う」は思い込みではなく、正直な感知。',
-    resonance_question: '「場の空気が違った」と感じた記録を、今開いてみてください。',
+    }
   },
 
   {
@@ -97,9 +91,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '「なんか違う」を言語化できない時は、違う対象を絞る。人か、場所か、内容か。',
       ready: '「なんか違う」を感じている時は、その感覚を行動の前に記録する。根拠は後でいい。'
-    },
-    plain_insight: '体が先に「合わない」と言っているサイン。理由を探す前に、まずその感知が起きたことを認めていい。',
-    resonance_question: '「なんか違う」をスルーした記録と、書き留めた記録を見比べてみてください。',
+    }
   },
 
   {
@@ -116,9 +108,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '腸を信頼できない時は、まず記録から始める。当たり率が見えると信頼が生まれる。',
       ready: '腸を信頼している時は、解釈より行動を優先していい。'
-    },
-    plain_insight: '腸が反応したという事実は嘘をつかない。「それが何を意味するか」の読み方を、記録しながら磨いていく。',
-    resonance_question: 'あなたの当たり率を確認してみてください。腸は嘘をついていましたか？',
+    }
   },
 
   {
@@ -135,9 +125,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: 'ざわっとを感じた後にすぐ言語化しなくていい。まずその感覚の場所と強さだけ記録する。',
       ready: 'ざわっとの意味が見えている時は、その直感を信頼して次の行動を選んでいい。'
-    },
-    plain_insight: '何かが起きる前に、体が先に気づいている。この一瞬を記録した人だけが、後から「あの時か」と繋げられる。',
-    resonance_question: '最近の記録に「ざわっと」や「なんか違う」があれば、その後どうなったか振り返ってみてください。',
+    }
   },
 
   {
@@ -154,9 +142,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '胆力が出ない時は、過去の当たり経験を振り返る。腸が正しかった回数を数える。',
       ready: '胆力がある状態では、迷わず動く。動いた後に記録する。'
-    },
-    plain_insight: '怖くないことではない。怖くても動けること。腸を信頼した回数が増えるほど、この力は育つ。',
-    resonance_question: '直感を信頼して動いた記録と、迷って止まった記録を見比べてみてください。',
+    }
   },
 
   {
@@ -173,9 +159,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '間が掴めない時は、相手の呼吸を見る。言葉ではなく身体のリズムを合わせる。',
       ready: '間が読めている時、言葉は最小限でいい。'
-    },
-    plain_insight: '沈黙や余白は「何もない」時間ではない。体がリズムを合わせようとしている、能動的な空間。',
-    resonance_question: '沈黙や間が生まれた場面の記録がありますか？その時、体はどのあたりで何かを感じていましたか？',
+    }
   },
 
   {
@@ -192,9 +176,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '先が読めない時は、情報を足すより立ち止まる時間を作る。',
       ready: '先が見えている時は、その見立てを早めに記録する。後で検証できる。'
-    },
-    plain_insight: '移動中や入浴中に「そういえば…」とひらめくのは、脳が休んでいる時こそ深く考えているから。',
-    resonance_question: '移動中や入浴中に浮かんだことを、その場で記録したことはありますか？',
+    }
   },
 
   {
@@ -211,9 +193,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '人となりが見えない時は、言葉ではなくその人の行動パターンを見る。',
       ready: '人となりが見えている時は、その直感を大切にしながら対話を重ねる。'
-    },
-    plain_insight: '言葉ではなく、一緒にいる時間の積み重ねが体に刻む印象。「なんとなく信頼できる」はここから来ている。',
-    resonance_question: '「なんとなく信頼できる」と感じた記録と、「なんかおかしい」と感じた記録を比べてみてください。',
+    }
   },
 
   {
@@ -227,12 +207,12 @@ const KNOWLEDGE = [
     tags: ['ENS', '腸神経系', '迷走神経', '身体知', 'プロジェクト核心'],
     socratic: ['all'],
     related: ['kotoba-005', 'kotoba-012', 'nou-001'],
+    plain_insight: '腸には5億個の神経細胞があります。脳より先に、世界を感じ取っています。\n「なんかそんな気がする」——それは根拠のない感覚ではなく、\n腸が既に出した答えです。\n頭が「なぜ？」と問う前に、体はもう知っている。',
+    resonance_question: '言葉にする前のその感覚——体のどこで感じていましたか？',
     coaching_hint: {
       not_yet: null,
       ready: null
-    },
-    plain_insight: '理屈より先に、体がもう答えを持っていることがある。それを「気のせい」で終わらせないための記録。',
-    resonance_question: '「理屈より先に体が答えを出していた」と思える記録は、どれですか？',
+    }
   },
 
   {
@@ -249,9 +229,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: null,
       ready: null
-    },
-    plain_insight: '熟練した人が「なんとなくわかる」と言う時、その「なんとなく」は曖昧ではない。形式知・暗黙知・実践知とも違う、体に宿った知識。',
-    resonance_question: 'あなたの「なんとなくわかる」は、何年の経験から来ていますか？',
+    }
   },
 
   {
@@ -268,9 +246,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: 'ピンとこない時は、頭で考えるのをやめてみる。散歩・入浴・休眠を挟む。',
       ready: 'ピンときた瞬間に即記録する。その感覚は揮発する。'
-    },
-    plain_insight: 'ぼんやりしている時間に価値がある理由。脳が集中を手放した時こそ、深いところで考えが進んでいる。',
-    resonance_question: 'ぼんやりしていた時に浮かんだことを、最後に記録したのはいつですか？',
+    }
   },
 
   {
@@ -287,9 +263,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '「なんとなく」の先を問い詰めない。「それはどのあたりで感じますか？」と場所を聴く。',
       ready: '「なんとなくそう感じている」を行動の根拠にしていい。記録で検証する。'
-    },
-    plain_insight: '「なんとなく」は説明できないだけで、ちゃんとそこにある。記録することで、後から意味が見えてくる。',
-    resonance_question: '「なんとなく」と感じた記録のうち、後から意味がわかったものはありますか？',
+    }
   },
 
   {
@@ -306,9 +280,7 @@ const KNOWLEDGE = [
     coaching_hint: {
       not_yet: '「腑に落ちない」を言えない環境では身体知は育たない。まず場の安全を作る。',
       ready: '「腑に落ちない」を口にできた瞬間が対話の本当の始まり。'
-    },
-    plain_insight: '頭ではわかっても体が乗り気でない時、体の方が正直なことが多い。「腑に落ちない」を言える場所が心理的安全性。',
-    resonance_question: '「頭ではわかるけど」という感覚があった記録、最近ありますか？その後どうなりましたか？',
+    }
   },
 
   // ══════════════════════════════════════
@@ -325,9 +297,7 @@ const KNOWLEDGE = [
     tags: ['ENS', '第二の脳', '迷走神経', '自律神経'],
     socratic: ['all'],
     related: ['kotoba-005', 'kotoba-011', 'nou-007'],
-    coaching_hint: null,
-    plain_insight: '腸には脳と独立した神経系があり、情報を先に処理して脳に送っている。「お腹が痛い」が不安の身体表現になるのはこのため。',
-    resonance_question: 'お腹の感覚（緊張・重さ・軽さ）を記録したことはありますか？',
+    coaching_hint: null
   },
 
   {
@@ -340,9 +310,7 @@ const KNOWLEDGE = [
     tags: ['基底核', '小脳', '習慣', 'パターン', '速い思考'],
     socratic: ['all'],
     related: ['kotoba-002', 'nou-007'],
-    coaching_hint: null,
-    plain_insight: '「考えなくてもできる」という感覚の正体。長年の経験が圧縮されて、一瞬で答えを出してくれる最も古い脳の部分。',
-    resonance_question: '「考える前に体が動いた」という記録が、直近にありますか？',
+    coaching_hint: null
   },
 
   {
@@ -355,9 +323,7 @@ const KNOWLEDGE = [
     tags: ['島皮質', '内受容感覚', '統合', '体感'],
     socratic: ['all'],
     related: ['kotoba-001', 'kotoba-004', 'nou-007'],
-    coaching_hint: null,
-    plain_insight: '体の感覚と気持ちと考えを一箇所でまとめている脳の部位。「腑に落ちる」は、ここが同意した瞬間に起きる。',
-    resonance_question: '「腑に落ちた」と記録した時、体のどのあたりで感じていたか、思い出せますか？',
+    coaching_hint: null
   },
 
   {
@@ -370,9 +336,7 @@ const KNOWLEDGE = [
     tags: ['扁桃体', '上側頭溝', '気配', '他者', '高速検知'],
     socratic: ['hito', 'basho'],
     related: ['kotoba-003', 'kotoba-006', 'nou-007'],
-    coaching_hint: null,
-    plain_insight: '「なんか様子がおかしい」を言葉より100分の1秒先に気づく部分。気配を読む、の神経学的な正体。',
-    resonance_question: '「気配がおかしかった」記録を振り返ると、その後実際に何かありましたか？',
+    coaching_hint: null
   },
 
   {
@@ -385,9 +349,7 @@ const KNOWLEDGE = [
     tags: ['PFC', 'mPFC', '意味づけ', '判断', '統合'],
     socratic: ['all'],
     related: ['kotoba-007', 'nou-007'],
-    coaching_hint: null,
-    plain_insight: '「なぜそう感じたのか」を言葉にするのがここの仕事。ただしここだけで考えると、体の声を聞き逃す。',
-    resonance_question: '「頭で考えすぎた」と後から思った記録は、当たりましたか？外れましたか？',
+    coaching_hint: null
   },
 
   {
@@ -400,9 +362,7 @@ const KNOWLEDGE = [
     tags: ['DMN', 'ぼんやり', 'ひらめき', 'デフォルト', '無意識'],
     socratic: ['kokoro', 'mono'],
     related: ['kotoba-009', 'kotoba-013', 'nou-005'],
-    coaching_hint: null,
-    plain_insight: 'ぼんやり・移動中・入浴中に最も活発に動くネットワーク。「何もしていない」時間に、深い問いへの答えが来る。',
-    resonance_question: '移動中や半覚醒時に浮かんだことを、記録に残しましたか？',
+    coaching_hint: null
   },
 
   {
@@ -415,9 +375,9 @@ const KNOWLEDGE = [
     tags: ['3層', 'Layer1', 'Layer2', 'Layer3', '構造', 'AI限界'],
     socratic: ['all'],
     related: ['nou-001', 'nou-002', 'nou-003', 'nou-004', 'nou-005', 'tetsugaku-005'],
-    coaching_hint: null,
-    plain_insight: '体→感情→言語の順に信号が流れている。逆順（言語→感情→体）では身体知は動かない。',
-    resonance_question: 'あなたの記録の中で「体の感覚→感情→言語」の順に展開したものはどれですか？',
+    plain_insight: '腸→感情→言語。体の信号はこの順で届きます。\n「なんとなく変だ」と思った瞬間、あなたの腸はもう答えを出していた。\n頭が「なぜそう思うのか」を理解するのは、その後のことです。\nAIが永遠に持てないのは、この1層目と2層目の処理です。',
+    resonance_question: '今感じていることは、体のどの層から来ていると思いますか？',
+    coaching_hint: null
   },
 
   // ══════════════════════════════════════
@@ -434,9 +394,9 @@ const KNOWLEDGE = [
     tags: ['現象学', '身体', '知覚', '西洋哲学'],
     socratic: ['all'],
     related: ['kotoba-012', 'hannya-002', 'tetsugaku-004'],
-    coaching_hint: null,
-    plain_insight: 'フランスの哲学者が神経科学の100年前に同じことを言った：知覚は体と世界の接触から生まれる。「見る」は目だけの仕事ではない。',
-    resonance_question: '「体が先に知っていた」と感じた記録を一つ選んで、読み返してみてください。',
+    plain_insight: '頭でわかることと、体で感じることは、まったく別物です。\n今あなたが感じているその感覚は、世界と体が直接触れている証拠。\n「説明できない」から本物じゃないわけじゃない——\nメルロ＝ポンティは言います、身体こそが世界への入口だと。',
+    resonance_question: '体が感じていることを、頭が否定したことはありますか？',
+    coaching_hint: null
   },
 
   {
@@ -449,9 +409,7 @@ const KNOWLEDGE = [
     tags: ['ロゴセラピー', '意味', '感知', '論証不要'],
     socratic: ['kokoro'],
     related: ['kotoba-001', 'tetsugaku-003'],
-    coaching_hint: null,
-    plain_insight: '「これをやらなければ」という感覚は、証明しなくても体が先に知っている。ホロコースト生還者が発見した、意味は測ると逃げるという真実。',
-    resonance_question: '「証明できないけど、やるべきだと感じた」記録はありますか？',
+    coaching_hint: null
   },
 
   {
@@ -464,9 +422,7 @@ const KNOWLEDGE = [
     tags: ['グッドハート', '測定', '管理', 'コーチング', '逆効果'],
     socratic: ['all'],
     related: ['tetsugaku-002', 'kotoba-007'],
-    coaching_hint: null,
-    plain_insight: '「やる気を出せ」が機能しない理由。自然な動機は管理しようとすると消える。記録は観察であって、管理ではない。',
-    resonance_question: '記録を「こなそう」とした時と「気になったから残した」時で、内容に違いはありましたか？',
+    coaching_hint: null
   },
 
   {
@@ -479,9 +435,7 @@ const KNOWLEDGE = [
     tags: ['龍樹', '中論', '唯識', '空', '仏教哲学'],
     socratic: ['all'],
     related: ['tetsugaku-001', 'hannya-001'],
-    coaching_hint: null,
-    plain_insight: '2500年前のインドの哲学者が「認識は体と対象の接触から生まれる」と言った。メルロ＝ポンティと独立に、同じ答えに辿り着いた。',
-    resonance_question: '同じ場所・同じ人なのに、感じ方が違った記録が二つありますか？',
+    coaching_hint: null
   },
 
   {
@@ -494,9 +448,7 @@ const KNOWLEDGE = [
     tags: ['AI', 'Singularity', 'ハード問題', 'チャーマーズ', '限界'],
     socratic: ['all'],
     related: ['nou-007', 'kotoba-012'],
-    coaching_hint: null,
-    plain_insight: 'AIが正しい言葉を出せても「腑に落ちた」とは言えない理由。島皮質と腸神経系は、体なしには再現できない。',
-    resonance_question: 'AIの答えより先に、体が答えを知っていた記録はありますか？',
+    coaching_hint: null
   },
 
   // ══════════════════════════════════════
@@ -508,14 +460,14 @@ const KNOWLEDGE = [
     title: '五蘊皆空（ごうんかいくう）',
     category: 'hannya',
     layer: null,
-    summary: '「五蘊皆空」——感覚・感情・思考・意志・意識のどれも、固定した実体はない。これが般若心経の最初の言葉。2500年前の根本命題。',
+    summary: '般若心経の根本命題。あなたを形づくるすべては固定していない——だから可能性は無限に広がる。',
     body: '色（物質・身体）、受（感覚・感受）、想（表象・知覚）、行（意志・形成力）、識（意識・判断）。「受」と「識」の間にある「想」「行」が身体知の処理に相当する。般若心経の「五蘊皆空」は、これら5要素の固定した実体はないと説く。腸で考えるは「受」と「識」の間の処理を大切にすること。',
-    tags: ['五蘊', '色受想行識', '仏教', '認識論'],
+    tags: ['五蘊', '色受想行識', '仏教', '認識論', '五蘊皆空'],
     socratic: ['all'],
     related: ['hannya-002', 'hannya-004', 'tetsugaku-004'],
-    coaching_hint: null,
-    plain_insight: '「五蘊皆空」——あなたを形づくるすべては固定していない。固まっていないから、可能性は無限に広がっている。般若心経の「空」とは欠如ではなく枠のない余白のこと。2500年前の言葉が、今のあなたの可能性を肯定している。',
-    resonance_question: '諦めていませんか？もうここまでと思っていませんか？——そんなことはないですよ。本当にやりたいことなら、できる未来しか見えないですもの。',
+    plain_insight: '「五蘊皆空」——あなたを形づくるすべては固定していない。\n固まっていないから、可能性は無限に広がっている。\n般若心経の「空」とは欠如ではなく枠のない余白のこと。\n2500年前の言葉が、今のあなたの可能性を肯定している。',
+    resonance_question: '諦めていませんか？もうここまでと思っていませんか？——\nそんなことはないですよ。\n本当にやりたいことなら、できる未来しか見えないですもの。',
+    coaching_hint: null
   },
 
   {
@@ -528,9 +480,7 @@ const KNOWLEDGE = [
     tags: ['十八界', '感覚器', '認識', '接触'],
     socratic: ['all'],
     related: ['hannya-001', 'tetsugaku-001'],
-    coaching_hint: null,
-    plain_insight: '五蘊皆空の具体展開。認識は「感覚器×対象×意識」の三つが揃って初めて生まれる。「見ようとしていないものは見えない」の構造的な説明。',
-    resonance_question: '同じ「言葉」でも、誰から聞くかで感じ方が違った記録はありますか？',
+    coaching_hint: null
   },
 
   {
@@ -543,9 +493,7 @@ const KNOWLEDGE = [
     tags: ['色即是空', '空', '無常', '瞬間'],
     socratic: ['all'],
     related: ['hannya-001', 'hannya-004'],
-    coaching_hint: null,
-    plain_insight: '五蘊皆空から展開する核心。「とらわれが解けた」感覚を哲学として言語化したもの。固定した正解はなく、だからこそ次の感知が起きる。',
-    resonance_question: '「これだ」と思った感覚が、翌日には変わっていた記録はありますか？',
+    coaching_hint: null
   },
 
   {
@@ -558,9 +506,7 @@ const KNOWLEDGE = [
     tags: ['般若心経', '大乗仏教', '262文字', '空'],
     socratic: ['all'],
     related: ['hannya-001', 'hannya-002', 'hannya-003'],
-    coaching_hint: null,
-    plain_insight: '262文字の哲学書。神に祈るテキストではなく、五蘊皆空を起点に「認識とは何か」を問い続けるための道具として書かれた。',
-    resonance_question: '記録を重ねるほど、同じ感覚への見方が変わってきていますか？',
+    coaching_hint: null
   }
 
 ];
@@ -596,4 +542,28 @@ function buildKnowledgeContext(cat) {
   );
 
   return `\n【思想の筋：般若心経→哲学→神経科学→身体知】\n${lines.join('\n')}\n`;
+}
+
+/**
+ * ことばの種（plain_insight + resonance_question）を取得
+ * lineage 4件の中からカテゴリに最も関連する1件を返す
+ * @param {string} cat - 'hito' | 'basho' | 'mono' | 'kokoro'
+ * @returns {{ title, plain_insight, resonance_question } | null}
+ */
+function buildKnowledgeResonance(cat) {
+  // カテゴリ固有優先順位
+  const catPriority = {
+    hito:   ['tetsugaku-001', 'hannya-001', 'kotoba-011', 'nou-007'],
+    basho:  ['kotoba-011', 'nou-007', 'tetsugaku-001', 'hannya-001'],
+    mono:   ['tetsugaku-001', 'kotoba-011', 'nou-007', 'hannya-001'],
+    kokoro: ['hannya-001', 'nou-007', 'kotoba-011', 'tetsugaku-001'],
+  };
+  const order = catPriority[cat] || ['hannya-001', 'tetsugaku-001', 'nou-007', 'kotoba-011'];
+  for (const id of order) {
+    const doc = KNOWLEDGE.find(d => d.id === id);
+    if (doc && doc.plain_insight && doc.resonance_question) {
+      return { title: doc.title, plain_insight: doc.plain_insight, resonance_question: doc.resonance_question };
+    }
+  }
+  return null;
 }

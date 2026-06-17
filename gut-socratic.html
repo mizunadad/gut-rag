@@ -327,7 +327,44 @@
   }
   .btn-restart:hover { border-color: var(--border2); color: var(--text2); }
 
-  /* ── nav back ── */
+  /* ── ことばの種 ── */
+  .kotoba-divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 4px 0;
+  }
+  .kotoba-toggle {
+    background: transparent; border: none;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em;
+    cursor: pointer; text-align: left;
+    padding: 6px 0; transition: color 0.2s;
+    text-transform: uppercase;
+  }
+  .kotoba-toggle:hover { color: var(--text2); }
+  .kotoba-toggle.open  { color: var(--text2); }
+  .kotoba-insight {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 300; font-size: 13px;
+    line-height: 2.1; color: var(--text2);
+    white-space: pre-wrap; padding-top: 14px;
+  }
+  .kotoba-resonance {
+    margin-top: 16px; padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1rem; line-height: 1.9;
+    color: var(--text); white-space: pre-wrap;
+  }
+  .kotoba-source {
+    margin-top: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--text3);
+    letter-spacing: 0.08em;
+  }
   .nav-back {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
@@ -530,6 +567,15 @@
   <button class="btn-restart" onclick="restart()" id="restartBtn" style="display:none">
     最初からやり直す
   </button>
+  <div id="kotobaSection" style="display:none">
+    <hr class="kotoba-divider">
+    <button class="kotoba-toggle" id="kotobaToggle" onclick="toggleKotoba()">▷ このことばの背景</button>
+    <div id="kotobaBody" style="display:none">
+      <div class="kotoba-insight" id="kotobaInsight"></div>
+      <div class="kotoba-resonance" id="kotobaResonance"></div>
+      <div class="kotoba-source" id="kotobaSource"></div>
+    </div>
+  </div>
 </div>
 
 <!-- API Key Modal -->
@@ -559,6 +605,7 @@
   API key —
 </div>
 
+<script src="demo_responses.js"></script>
 <script src="knowledge.js"></script>
 <script>
 // ── Data ──
@@ -815,8 +862,40 @@ function selectChoice(choice, btn, cat) {
 
 // ── Go deep: call LLM ──
 async function goDeep() {
-  // APIキー未設定ならモーダルを出して中断
-  if (!getApiKey()) { openApikeyModal(true); return; }
+  // APIキー未設定 → 体験モード
+  if (!getApiKey()) {
+    const choiceIdx = QUESTIONS[state.cat].choices.indexOf(state.choice);
+    const demo = (typeof getDemoResponse === 'function')
+      ? getDemoResponse(state.cat, choiceIdx) : null;
+
+    document.getElementById('responseOrb').className = `response-orb ${state.cat}`;
+    document.getElementById('responseBody').textContent = '';
+    document.getElementById('responseBody').className = 'response-body';
+    document.getElementById('responseDivider').style.display = 'none';
+    document.getElementById('nextQLabel').style.display = 'none';
+    document.getElementById('nextQBox').style.display = 'none';
+    document.getElementById('restartBtn').style.display = 'none';
+    document.getElementById('expBadge').style.display = 'none';
+    document.getElementById('kotobaSection').style.display = 'none';
+    go(4);
+
+    if (demo) {
+      document.getElementById('responseBody').textContent = demo.kidzuki;
+      document.getElementById('responseDivider').style.display = 'block';
+      document.getElementById('nextQLabel').style.display = 'block';
+      document.getElementById('nextQBox').textContent = demo.nextQ;
+      document.getElementById('nextQBox').style.display = 'block';
+    } else {
+      document.getElementById('responseBody').textContent =
+        'デモ応答を読み込めませんでした。APIキーを設定してお試しください。';
+    }
+    document.getElementById('restartBtn').style.display = 'block';
+    showDemoBadge();
+    showKotobanSeed(state.cat);
+    return;
+  }
+
+  // APIキーあり → 通常モード
 
   const catNames = { hito:'人', basho:'場所', mono:'もの', kokoro:'ココロ' };
   document.getElementById('responseOrb').className = `response-orb ${state.cat}`;
@@ -827,6 +906,7 @@ async function goDeep() {
   document.getElementById('nextQBox').style.display = 'none';
   document.getElementById('restartBtn').style.display = 'none';
   document.getElementById('expBadge').style.display = 'none';
+  document.getElementById('kotobaSection').style.display = 'none';
   go(4);
 
   // 経験文書・知識文書を取得してプロンプトに注入
@@ -864,6 +944,9 @@ ${knowContext}${expContext}
 【次の問い】
 （1文。答えを求めず、さらに深い感覚へ誘う問い。）
 
+【問いの向き】
+（根・境・識のいずれか1語のみ。根＝身体・感覚器への問いなら「根」、境＝対象・何がへの問いなら「境」、識＝認識・意味づけへの問いなら「識」。）
+
 形式通りに返してください。余計な説明は不要です。`;
 
   try {
@@ -895,9 +978,12 @@ ${knowContext}${expContext}
 
     const text = data.content.map(b => b.text || '').join('');
     const kidzukiMatch = text.match(/【気づき】\s*([\s\S]*?)(?=【次の問い】|$)/);
-    const nextMatch    = text.match(/【次の問い】\s*([\s\S]*?)$/);
+    const nextMatch    = text.match(/【次の問い】\s*([\s\S]*?)(?=【問いの向き】|$)/);
+    const kaiMatch     = text.match(/【問いの向き】\s*([\s\S]*?)$/);
     const kidzuki = kidzukiMatch ? kidzukiMatch[1].trim() : text;
     const nextQ   = nextMatch   ? nextMatch[1].trim()    : '';
+    const kaiRaw  = kaiMatch    ? kaiMatch[1].trim()     : '';
+    const kai     = ['根', '境', '識'].find(k => kaiRaw.includes(k)) || null;
 
     document.getElementById('responseBody').textContent = kidzuki;
     document.getElementById('responseBody').className = 'response-body';
@@ -907,8 +993,16 @@ ${knowContext}${expContext}
       document.getElementById('nextQLabel').style.display = 'block';
       document.getElementById('nextQBox').textContent = nextQ;
       document.getElementById('nextQBox').style.display = 'block';
+
+      // D案v2: 次の問いを gut-logger へ持ち越す
+      try {
+        localStorage.setItem('gut_next_q', JSON.stringify({
+          q: nextQ, kai: kai, cat: state.cat, ts: Date.now()
+        }));
+      } catch(_) {}
     }
     document.getElementById('restartBtn').style.display = 'block';
+    showKotobanSeed(state.cat);
 
   } catch(e) {
     document.getElementById('responseBody').textContent = 'うまく繋がれませんでした。もう一度試してみてください。';
@@ -919,7 +1013,43 @@ ${knowContext}${expContext}
 
 function restart() {
   state = { cat: null, emoji: null, choice: null };
+  // ことばの種を閉じてリセット
+  document.getElementById('kotobaBody').style.display = 'none';
+  const toggle = document.getElementById('kotobaToggle');
+  toggle.textContent = '▷ このことばの背景';
+  toggle.classList.remove('open');
   go(0);
+}
+
+// ── 体験モードバッジ ──
+function showDemoBadge() {
+  const badge = document.getElementById('expBadge');
+  badge.innerHTML =
+    '✦ 体験モード &nbsp;—&nbsp; ' +
+    '<span style="text-decoration:underline;cursor:pointer" onclick="openApikeyModal(false)">' +
+    'APIキーを設定すると、あなたの記録と連動した応答になります' +
+    '</span>';
+  badge.style.display = 'inline-block';
+}
+
+// ── ことばの種 ──
+function toggleKotoba() {
+  const body   = document.getElementById('kotobaBody');
+  const toggle = document.getElementById('kotobaToggle');
+  const isOpen = body.style.display === 'block';
+  body.style.display = isOpen ? 'none' : 'block';
+  toggle.textContent  = isOpen ? '▷ このことばの背景' : '▽ このことばの背景';
+  toggle.classList.toggle('open', !isOpen);
+}
+
+function showKotobanSeed(cat) {
+  if (typeof buildKnowledgeResonance !== 'function') return;
+  const seed = buildKnowledgeResonance(cat);
+  if (!seed) return;
+  document.getElementById('kotobaInsight').textContent   = seed.plain_insight;
+  document.getElementById('kotobaResonance').textContent = seed.resonance_question;
+  document.getElementById('kotobaSource').textContent    = '— ' + seed.title;
+  document.getElementById('kotobaSection').style.display = 'block';
 }
 
 // ── Init ──
