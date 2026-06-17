@@ -35,6 +35,13 @@
 
 https://mizunadad.github.io/gut-rag/
 
+## Socratic Explorer はAPIキーなしで体験できます
+
+「もっと深く探る」を押すと、デモ応答（体験モード）が返ってきます。
+APIキーを設定すると、あなた自身の記録と連動したパーソナライズ応答になります。
+
+→ [今すぐ体験する](https://mizunadad.github.io/gut-rag/gut-socratic.html)
+
 ## データの取り扱い
 
 - 記録はすべてブラウザの外に出ません

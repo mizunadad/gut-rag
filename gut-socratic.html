@@ -911,9 +911,11 @@ async function goDeep() {
 
   // 経験文書・知識文書を取得してプロンプトに注入
   const exp = retrieveExperienceDocs();
-  const expContext = buildExpContext(exp);
-  const knowContext = (typeof buildKnowledgeContext === 'function')
+  const expContext     = buildExpContext(exp);
+  const knowContext    = (typeof buildKnowledgeContext === 'function')
     ? buildKnowledgeContext(state.cat) : '';
+  const meaningContext = (typeof buildMeaningKnowledge === 'function' && exp && exp.topTags)
+    ? buildMeaningKnowledge(exp.topTags) : '';
 
   if (exp && exp.decided >= 2) {
     const badge = document.getElementById('expBadge');
@@ -929,7 +931,7 @@ async function goDeep() {
 - カテゴリ：${catNames[state.cat]}
 - 選んだ絵文字：${state.emoji.e}（${state.emoji.label}）
 - 感じていること：${state.choice}
-${knowContext}${expContext}
+${knowContext}${meaningContext}${expContext}
 【応答の指針】
 以下の思想の筋が、応答の中に自然に流れるようにしてください：
   般若心経・五蘊 → 哲学×仏教 → 神経科学3層 → 身体知の言葉

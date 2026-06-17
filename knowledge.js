@@ -545,6 +545,56 @@ function buildKnowledgeContext(cat) {
 }
 
 /**
+ * C案：meaningタグ → 知識文書マッピングテーブル
+ * gut-loggerで選ばれたmeaningタグから、関連する身体知ドキュメントIDを返す
+ */
+const MEANING_KNOWLEDGE_MAP = {
+  // ── 当たった時 ──
+  '過去の知見が生きた':         ['kotoba-002', 'nou-002'],   // 直感, 基底核
+  '過去の経験通りだった':       ['kotoba-002', 'kotoba-013'],// 直感, ピンとくる
+  '相手の状態を読んでいた':     ['kotoba-003', 'nou-004'],   // 気配を読む, 扁桃体
+  '場の空気を感じていた':       ['kotoba-003', 'kotoba-008'],// 気配を読む, 間
+  '数値の異常を先に感じていた': ['kotoba-002', 'nou-001'],   // 直感, ENS
+  '情報のズレを検知していた':   ['kotoba-004', 'nou-003'],   // なんか違う, 島皮質
+  '前提が違った':               ['kotoba-004', 'kotoba-015'],// なんか違う, 腑に落ちない
+  '別の文脈と混同していた':     ['kotoba-015', 'nou-005'],   // 腑に落ちない, PFC
+  // ── 外れた時 ──
+  '思い込みだった':             ['tetsugaku-003', 'nou-005'],// グッドハート, PFC
+  '過剰反応だった':             ['nou-004', 'kotoba-006'],   // 扁桃体, ざわっと
+  '別の要因だった':             ['kotoba-004', 'nou-003'],   // なんか違う, 島皮質
+  'タイミングが早すぎた':       ['kotoba-014', 'nou-001'],   // なんとなく, ENS
+  '情報が足りなかった':         ['kotoba-014', 'kotoba-002'],// なんとなく, 直感
+};
+
+/**
+ * meaningタグから関連する知識文書コンテキストを生成（C案）
+ * @param {string[]} topTags - gut-loggerの上位meaningタグ（最大3件）
+ * @returns {string} プロンプト注入用テキスト
+ */
+function buildMeaningKnowledge(topTags) {
+  if (!topTags || topTags.length === 0) return '';
+
+  // タグ→IDを収集（重複除外）
+  const docIds = new Set();
+  topTags.forEach(tag => {
+    (MEANING_KNOWLEDGE_MAP[tag] || []).forEach(id => docIds.add(id));
+  });
+
+  // lineage固定4件と重複するものは除外（プロンプトの冗長化を防ぐ）
+  const lineageIds = new Set(['hannya-001', 'tetsugaku-001', 'nou-007', 'kotoba-011']);
+  const docs = [...docIds]
+    .filter(id => !lineageIds.has(id))
+    .map(id => KNOWLEDGE.find(d => d.id === id))
+    .filter(Boolean)
+    .slice(0, 3); // 最大3件
+
+  if (!docs.length) return '';
+
+  const lines = docs.map(d => `・${d.title}（${d.category}）：${d.summary}`);
+  return `\n【あなたの直感パターンに関連する身体知】\n${lines.join('\n')}\n`;
+}
+
+/**
  * ことばの種（plain_insight + resonance_question）を取得
  * lineage 4件の中からカテゴリに最も関連する1件を返す
  * @param {string} cat - 'hito' | 'basho' | 'mono' | 'kokoro'
