@@ -517,8 +517,8 @@ const KNOWLEDGE = [
  * 各層（般若心経・哲学・神経科学・身体知）から必ず1件確保する
  * @param {string} cat - 'hito' | 'basho' | 'mono' | 'kokoro'
  */
+
 function buildKnowledgeContext(cat) {
-  // ── 思想の筋：各層から代表1件を必ず確保 ──
   const lineage = [
     KNOWLEDGE.find(d => d.id === 'hannya-001'),     // 般若心経層：五蘊
     KNOWLEDGE.find(d => d.id === 'tetsugaku-001'),  // 哲学層：メルロ＝ポンティ
