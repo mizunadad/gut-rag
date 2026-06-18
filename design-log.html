@@ -47,6 +47,7 @@
   .notyet{background:rgba(248,113,113,.1);color:var(--bad);border:1px solid rgba(248,113,113,.2);}
   .plan-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;}
   .plan-num{font-family:'DM Mono',monospace;font-size:20px;color:var(--text3);line-height:1;padding-top:4px;min-width:28px;}
+  .plan-num.done-num{color:var(--good);}
   .plan-content .plan-title{font-size:13px;color:var(--text);margin-bottom:6px;}
   .plan-content .plan-desc{font-size:12px;color:var(--text2);line-height:1.8;}
   .divider{border:none;border-top:1px solid var(--border);margin:40px 0;}
@@ -58,6 +59,22 @@
   .zenn-body{font-size:12px;color:var(--text2);line-height:1.8;}
   .zenn-body strong{color:var(--text);font-weight:400;}
   .footer{text-align:center;padding:40px 24px 0;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);}
+  /* 螺旋図 */
+  .spiral{display:flex;flex-direction:column;gap:0;margin:20px 0;}
+  .spiral-row{display:flex;align-items:center;gap:12px;padding:10px 0;}
+  .spiral-node{font-size:12px;padding:6px 14px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap;}
+  .s-logger{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--signal);}
+  .s-tag{background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.3);color:var(--tetsugaku);}
+  .s-know{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--hannya);}
+  .s-soc{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:var(--nou);}
+  .s-nudge{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--signal);}
+  .spiral-arrow{color:var(--text3);font-size:18px;line-height:1;}
+  .spiral-label{font-size:11px;color:var(--text3);}
+  /* sw warning box */
+  .warn-box{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px 18px;margin-bottom:12px;}
+  .warn-box .warn-title{font-size:12px;color:var(--bad);margin-bottom:6px;font-family:'DM Mono',monospace;}
+  .warn-box .warn-body{font-size:12px;color:var(--text2);line-height:1.8;}
+  .code{font-family:'DM Mono',monospace;font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin:10px 0;color:var(--good);line-height:1.7;}
 </style>
 </head>
 <body>
@@ -68,7 +85,8 @@
   <div class="hero-sub">
     壁打ちセッションで生まれた洞察・設計決定・実装状況の記録。<br>
     生きたアプリの証として、ここに残す。
-  </div>  <div class="筋">
+  </div>
+  <div class="筋">
     <span class="筋-item h-hannya">般若心経・五蘊</span>
     <span class="筋-arrow">→</span>
     <span class="筋-item h-tetsugaku">哲学×仏教</span>
@@ -89,7 +107,7 @@
     <div class="insight">
       <div class="insight-text">
         <em>「腸で感じた直感を、記録し、問いを通じて言語化する」</em><br>
-        集合知ではなく個人知の蓄積。継承されるのは知識文書という思想の枠組みのみ。
+        個人知の蓄積。継承されるのは知識文書という思想の枠組みのみ。
       </div>
     </div>
     <div class="card">
@@ -126,10 +144,11 @@
 
   <section>
     <div class="sec-label">// 02 — 2つの流れの関係性</div>
-    <h2>経験文書と知識文書は今どこで出会うか</h2>
+    <h2>経験文書と知識文書はどこで出会うか</h2>
     <div class="insight">
       <div class="insight-text">
-        <em>「並列注入であり、合流はLLMに委ねている」</em>が正確な現状。
+        <em>「並列注入であり、合流はLLMに委ねている」</em>が基本構造。<br>
+        C案（v4）で、meaningタグを介した<em>検索レベルの接続</em>が加わった。
       </div>
     </div>
     <div class="card">
@@ -141,18 +160,21 @@
       </div>
     </div>
     <div class="card">
-      <div class="card-title">知識文書（knowledge.js）</div>
+      <div class="card-title">知識文書（knowledge.js）— lineage retrieval</div>
       <div class="card-body">
-        31件の文書から思想の筋を代表する文書を選択・注入<br>
+        31件の文書から思想の筋の4層（般若心経・哲学・神経科学・身体知）の代表を必ず確保し注入<br>
         → LLMは「このプロジェクトの文脈と語彙」を知る
       </div>
     </div>
     <div class="card">
-      <div class="card-title">2つの流れの現在地</div>
+      <div class="card-title">C案：meaningタグ → 知識文書の橋（v4 実装済み）</div>
       <div class="card-body">
-        検索レベルでは相互に無関係。LLMの中で初めて出会う。<br>
-        <strong>未実装の接続：</strong>meaningタグ「場の空気を感じていた」がkotoba-003（気配を読む）に対応するような紐づけはまだない。<br>
-        これが実装されると、経験と知識が検索レベルで繋がる。
+        「場の空気を感じていた」→ kotoba-003（気配を読む）/ kotoba-008（間）<br>
+        「思い込みだった」→ tetsugaku-003（グッドハートの法則）/ nou-005（PFC）<br>
+        13タグ定義済み。lineageとの重複は除外して注入。<br><br>
+        <strong>注入順序（確定）：</strong><br>
+        lineage（普遍・固定）→ meaningContext（経験由来・変動）→ expContext（統計・変動）<br>
+        LLMに渡る文脈が「普遍→個人固有」の順に流れる。この順序が応答の深さに直結する。
       </div>
     </div>
   </section>
@@ -160,7 +182,7 @@
   <hr class="divider">
 
   <section>
-    <div class="sec-label">// 03 — 実装状況（正直な評価）</div>
+    <div class="sec-label">// 03 — 実装状況（v4時点・正直な評価）</div>
     <h2>今の実装で何が動いていて、何が足りないか</h2>
     <table class="status-table">
       <tr>
@@ -172,34 +194,54 @@
         <td>gut-logger集計値をプロンプト注入</td>
       </tr>
       <tr>
-        <td>知識文書RAG（基本）</td>
-        <td><span class="badge partial">△ 部分実装</span></td>
-        <td>タグフィルタあり・筋の保証なし</td>
+        <td>知識文書RAG（lineage）</td>
+        <td><span class="badge done">✅ 実装済み</span></td>
+        <td>思想の筋4層から必ず1件確保</td>
       </tr>
       <tr>
-        <td>思想の筋の注入保証</td>
-        <td><span class="badge notyet">❌ 未実装</span></td>
-        <td>各層（般若心経・哲学・神科・身体知）の代表文書が必ず入る保証がない</td>
+        <td>思想の筋のプロンプト明示</td>
+        <td><span class="badge done">✅ 実装済み</span></td>
+        <td>LLMに「この筋で応答せよ」という指示を追加</td>
       </tr>
       <tr>
-        <td>プロンプトへの筋の明示</td>
-        <td><span class="badge notyet">❌ 未実装</span></td>
-        <td>LLMに「この筋で応答せよ」という指示がない</td>
+        <td>meaningタグ↔知識文書の連携（C案）</td>
+        <td><span class="badge done">✅ 実装済み</span></td>
+        <td>MEANING_KNOWLEDGE_MAP 13タグ定義、lineage重複除外</td>
       </tr>
       <tr>
-        <td>meaningタグ↔知識文書の連携</td>
-        <td><span class="badge notyet">❌ 未実装</span></td>
-        <td>2つの流れが検索レベルで繋がっていない</td>
+        <td>「次の問い」の持ち越し（D案v2）</td>
+        <td><span class="badge done">✅ 実装済み</span></td>
+        <td>gut_next_q → gut-loggerナッジバナー（48h有効）</td>
       </tr>
       <tr>
-        <td>「次の問い」の継続性</td>
-        <td><span class="badge notyet">❌ 未実装</span></td>
-        <td>閉じると消える。1Q1A化リスクあり</td>
+        <td>体験モード（デモ応答24件）</td>
+        <td><span class="badge done">✅ 実装済み</span></td>
+        <td>APIキー不要で「もっと深く探る」を体験</td>
       </tr>
       <tr>
-        <td>記録のエクスポート</td>
-        <td><span class="badge notyet">❌ 未実装</span></td>
-        <td>localStorageが消えると記録が失われる</td>
+        <td>ことばの種 UI</td>
+        <td><span class="badge done">✅ 実装済み</span></td>
+        <td>plain_insight + resonance_question をSocratic応答後に表示</td>
+      </tr>
+      <tr>
+        <td>記録エクスポート</td>
+        <td><span class="badge done">✅ 実装済み</span></td>
+        <td>JSONでローカルダウンロード、localStorage喪失リスク対策</td>
+      </tr>
+      <tr>
+        <td>plain_insight（全31件）</td>
+        <td><span class="badge partial">△ 4件のみ</span></td>
+        <td>lineage 4件は完了。残27件は未追加</td>
+      </tr>
+      <tr>
+        <td>design-log.html 更新</td>
+        <td><span class="badge done">✅ 実装済み</span></td>
+        <td>このページ</td>
+      </tr>
+      <tr>
+        <td>Zenn記事</td>
+        <td><span class="badge notyet">保留</span></td>
+        <td>全実装完了後</td>
       </tr>
     </table>
   </section>
@@ -207,41 +249,48 @@
   <hr class="divider">
 
   <section>
-    <div class="sec-label">// 04 — 更新プラン</div>
-    <h2>次にやること、その順序</h2>
+    <div class="sec-label">// 04 — 実装プランの履歴</div>
+    <h2>やったこと・その順序</h2>
     <div class="plan-row">
-      <div class="plan-num">A</div>
+      <div class="plan-num done-num">A</div>
       <div class="plan-content">
-        <div class="plan-title">buildKnowledgeContext 再設計（優先度：高）</div>
-        <div class="plan-desc">思想の筋の各層から必ず1件確保する。<br>hannya-001（五蘊）/ tetsugaku-001（メルロ＝ポンティ）/ nou-007（3層構造）/ kotoba-011（腸で考える）を常に注入。</div>
+        <div class="plan-title">buildKnowledgeContext 再設計 ✅</div>
+        <div class="plan-desc">思想の筋の各層から必ず1件確保する。hannya-001 / tetsugaku-001 / nou-007 / kotoba-011 を常に注入。</div>
       </div>
     </div>
     <div class="plan-row">
-      <div class="plan-num">B</div>
+      <div class="plan-num done-num">B</div>
       <div class="plan-content">
-        <div class="plan-title">Socraticプロンプトに筋の明示を追加（優先度：高）</div>
-        <div class="plan-desc">「以下の思想の筋が応答に自然に流れるよう：般若心経・五蘊 → 哲学 → 神経科学 → 身体知」をプロンプトに明記する。</div>
+        <div class="plan-title">Socraticプロンプトに筋の明示を追加 ✅</div>
+        <div class="plan-desc">「以下の思想の筋が応答に自然に流れるよう：般若心経・五蘊 → 哲学 → 神経科学 → 身体知」をプロンプトに明記。</div>
       </div>
     </div>
     <div class="plan-row">
-      <div class="plan-num">C</div>
+      <div class="plan-num done-num">C</div>
       <div class="plan-content">
-        <div class="plan-title">meaningタグ → 知識文書対応表（優先度：中）</div>
-        <div class="plan-desc">「場の空気を感じていた」→ kotoba-003, nou-004 のような対応表を作る。経験と知識が検索レベルで繋がる。</div>
+        <div class="plan-title">meaningタグ → 知識文書対応表 ✅</div>
+        <div class="plan-desc">13タグ定義済み。lineage固定4件との重複を除外する設計が重要。経験と知識が検索レベルで繋がった。</div>
       </div>
     </div>
     <div class="plan-row">
-      <div class="plan-num">D</div>
+      <div class="plan-num done-num">D</div>
       <div class="plan-content">
-        <div class="plan-title">「この問いを持ち歩く」機能（優先度：中）</div>
-        <div class="plan-desc">「次の問い」をgut-loggerに保存して継続性をつくる。Socratic → gut-logger への逆方向の接続。1Q1Aリスクの解消。</div>
+        <div class="plan-title">「この問いを持ち歩く」機能（D案v2） ✅</div>
+        <div class="plan-desc">「次の問い」と問いの向き（根/境/識）をgut-loggerに保存。48時間有効なナッジバナーとして表示。螺旋構造の完成。</div>
       </div>
     </div>
     <div class="plan-row">
-      <div class="plan-num">E</div>
+      <div class="plan-num done-num">E</div>
       <div class="plan-content">
-        <div class="plan-title">記録エクスポート機能（優先度：低）</div>
-        <div class="plan-desc">gut-loggerの記録をJSON/CSVで書き出せるようにする。localStorage喪失リスクへの対策。</div>
+        <div class="plan-title">記録エクスポート機能 ✅</div>
+        <div class="plan-desc">gut-loggerのパターンタブからJSON書き出し。profile + logs + exportedAt をまとめてダウンロード。</div>
+      </div>
+    </div>
+    <div class="plan-row">
+      <div class="plan-num done-num">F</div>
+      <div class="plan-content">
+        <div class="plan-title">体験モード + ことばの種 UI ✅</div>
+        <div class="plan-desc">APIキーなしで24件のデモ応答を体験。Socratic応答後に plain_insight + resonance_question を折りたたみ表示。</div>
       </div>
     </div>
   </section>
@@ -249,43 +298,130 @@
   <hr class="divider">
 
   <section>
-    <div class="sec-label">// 05 — Zenn記事の訴求点</div>
-    <h2>この経験から伝えたいこと</h2>
-    <div class="zenn-item">
-      <div class="zenn-num">①</div>
-      <div class="zenn-body"><strong>なぜベクトル化しなかったか</strong><br>身体知は言語化の前にある。だからベクトル空間（意味の空間）での類似検索は、構造的に一致しない。</div>
+    <div class="sec-label">// 05 — 螺旋構造の完成（v4）</div>
+    <h2>腸→脳→腸、というループが動き始めた</h2>
+    <div class="insight">
+      <div class="insight-text">
+        <em>色即是空・空即是色</em>と同型。記録が問いを呼び、問いが新たな記録を生む。
+      </div>
     </div>
-    <div class="zenn-item">
-      <div class="zenn-num">②</div>
-      <div class="zenn-body"><strong>このツールが解くのは何か（再定義）</strong><br>集合知ではなく、<strong>個人の直感を言語化して理解に繋げること</strong>。過剰な主張を外し、今できることに誠実に。</div>
+    <div class="spiral">
+      <div class="spiral-row">
+        <span class="spiral-node s-logger">腸（感知）</span>
+        <span class="spiral-arrow">→</span>
+        <span class="spiral-node s-logger">gut-logger 記録</span>
+        <span class="spiral-label">感覚・文脈・meaning タグ</span>
+      </div>
+      <div class="spiral-row" style="padding-left:20px;">
+        <span class="spiral-arrow" style="transform:rotate(90deg)">→</span>
+      </div>
+      <div class="spiral-row">
+        <span class="spiral-node s-tag">meaning タグ</span>
+        <span class="spiral-arrow">→</span>
+        <span class="spiral-node s-know">C案：知識文書を呼ぶ</span>
+        <span class="spiral-label">MEANING_KNOWLEDGE_MAP</span>
+      </div>
+      <div class="spiral-row" style="padding-left:20px;">
+        <span class="spiral-arrow" style="transform:rotate(90deg)">→</span>
+      </div>
+      <div class="spiral-row">
+        <span class="spiral-node s-soc">Socratic 深掘り</span>
+        <span class="spiral-arrow">→</span>
+        <span class="spiral-node s-soc">問いの向き（根/境/識）</span>
+        <span class="spiral-label">D案v2：gut_next_q に保存</span>
+      </div>
+      <div class="spiral-row" style="padding-left:20px;">
+        <span class="spiral-arrow" style="transform:rotate(90deg)">→</span>
+      </div>
+      <div class="spiral-row">
+        <span class="spiral-node s-nudge">gut-logger ナッジバナー</span>
+        <span class="spiral-arrow">→</span>
+        <span class="spiral-node s-logger">腸（新たな感知）</span>
+        <span class="spiral-label">48h 有効・✕で手動消去</span>
+      </div>
     </div>
-    <div class="zenn-item">
-      <div class="zenn-num">③</div>
-      <div class="zenn-body"><strong>もしベクトル化したら何が得られ、何が失われるか</strong><br>読者の探求心を刺激する。「自分だったらどう設計するか」を考えさせる。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">④</div>
-      <div class="zenn-body"><strong>次の地平：グラフ探索型RAG</strong><br>完全構造図のrequires/enablesをそのまま辿る実装。思想の筋を最も忠実に継承できる可能性。続きを読みたくなる終わり方。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">⑤</div>
-      <div class="zenn-body"><strong>制約が思想を生んだ</strong><br>「バックエンドなし・vanilla JS・GitHub Pages完結」という制約が、「なぜベクトル化しないか」という問いを産んだ。やってみた価値は、こうやって紡がれる。</div>
+    <div class="card">
+      <div class="card-title">十八界（根/境/識）との対応</div>
+      <div class="card-body">
+        根（感覚器・身体）↔ gut-loggerの感覚ラベル<br>
+        境（対象・何が）↔ gut-loggerの文脈ラベル<br>
+        識（認識・意味づけ）↔ gut-loggerのmeaningタグ<br><br>
+        Socraticが返す「問いの向き」（根/境/識）は、この分類に基づく。<br>
+        次の記録でどの軸に注目すべきかをユーザーに伝える。
+      </div>
     </div>
   </section>
 
   <hr class="divider">
 
   <section>
-    <div class="sec-label">// 06 — セッションで生まれた問い</div>
+    <div class="sec-label">// 06 — 体験モードの設計哲学</div>
+    <h2>摩擦を体験の前に置かない</h2>
+    <div class="insight">
+      <div class="insight-text">
+        <em>「APIキーを設定しないと動かない」は、まだ体験していない人に向けたハードルだ。</em><br>
+        体験してから設定する、の順が正しい。
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">設計の判断</div>
+      <div class="card-body">
+        APIキー未設定の状態で「もっと深く探る」を押した瞬間、デモ応答が流れる。<br>
+        「✦ 体験モード」バッジと、APIキー設定への自然な導線を同時に表示。<br><br>
+        <strong>24件のプリセット：</strong> 4カテゴリ × 6チョイス。<br>
+        プリセットは「典型的な気づき」であり、パーソナライズ応答との差分がAPIキー設定への動機になる。
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">ことばの種（plain_insight + resonance_question）</div>
+      <div class="card-body">
+        Socratic応答後に折りたたみセクションとして出現。タップで開くと：<br>
+        ・plain_insight：宗教・学術フレームを外した体感の言葉（1〜3文）<br>
+        ・resonance_question：知識から記録へ向かう問い（gut-loggerへの橋）<br><br>
+        <strong>設計原則：</strong>「ことばの種」は解説ではなく、「開く扉」。<br>
+        「この言葉、なんだろう」と思わせれば成功。説明しきらないことが価値。<br><br>
+        現状：lineage 4件のみ plain_insight を追加済み。残27件は未追加。
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-label">// 07 — sw.js の教訓</div>
+    <h2>サービスワーカーが外部オリジンを横取りしていた</h2>
+    <div class="warn-box">
+      <div class="warn-title">// BUG: TypeError: body is already used</div>
+      <div class="warn-body">旧 sw.js は外部オリジン（api.anthropic.com）の fetch も横取りしていた。<br>
+      レスポンスを r.clone() + return r で二重消費 → API 呼び出しが無音で失敗。</div>
+    </div>
+    <div class="card">
+      <div class="card-title">修正（v6）</div>
+      <div class="card-body">
+        <div class="code">// 外部オリジンは即座にバイパス<br>if (url.origin !== self.location.origin) return;</div>
+        この1行をfetchイベントの先頭に入れる。<br>
+        GitHub Pages + Anthropic API の構成では必須。<br><br>
+        <strong>教訓：</strong>PWAのサービスワーカーは、外部API通信と共存する場合にオリジンチェックが不可欠。<br>
+        外部オリジンをバイパスしないと、APIレスポンスのbodyが消費済みになりエラーになる。
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-label">// 08 — セッションで生まれた問い</div>
     <h2>まだ答えが出ていないこと</h2>
     <div class="card">
       <div class="card-body">
-        「記録をやめたとたん、1Q1Aになる」リスクをどう設計で防ぐか<br>
-        → 問い（not 答え）が継続性を担う設計へ<br><br>
-        meaningタグと知識文書の意味的な対応関係は誰が定義するか<br>
-        → 使いながら帰納的に決める？ 先に演繹的に設計する？<br><br>
-        「288種類の応答の出所を追える」体験をどうアプリ上で伝えるか<br>
-        → それ自体が教育コンテンツになる可能性
+        plain_insight 残27件をどのタイミングで追加するか<br>
+        → ことばの種UIはlineage 4件でも機能する。残りは優先度低<br><br>
+        ことばの種の「体験」はどう評価するか<br>
+        → 「腑に落ちるか」という感覚的評価が唯一の基準。数値化できない<br><br>
+        螺旋がどこで途切れるか<br>
+        → ナッジを無視したとき。設計は「無視しても失わない」を原則とすべき<br><br>
+        Zenn記事の入口をどこに置くか<br>
+        → 「なんか違う、を無視してきた」という共感点から始める
       </div>
     </div>
   </section>
@@ -293,7 +429,7 @@
   <hr class="divider">
 
   <section>
-    <div class="sec-label">// 07 — 造語・新概念</div>
+    <div class="sec-label">// 09 — 造語・新概念</div>
     <h2>このプロジェクトで生まれた言葉</h2>
     <div class="card">
       <div class="card-title">lineage retrieval（リネージ・リトリーバル）</div>
@@ -306,15 +442,42 @@
         <strong>このプロジェクトでの実装：</strong><br>
         般若心経（hannya-001）→ 哲学（tetsugaku-001）→ 神経科学（nou-007）→ 身体知（kotoba-011）の4層から必ず1件ずつ取得し、Socraticのプロンプトに注入する。<br><br>
         <strong>なぜこの名前か：</strong><br>
-        身体知は言語化の「前」に存在するため、意味の空間（ベクトル空間）での類似検索とは構造的に不一致。思想の筋は類似度ではなく継承の順序であり、その継承（lineage）に沿って取得することが設計思想と一致する。既存の技術用語では表現できないため、このプロジェクトで命名した。
+        身体知は言語化の「前」に存在するため、意味の空間（ベクトル空間）での類似検索とは構造的に不一致。思想の筋は類似度ではなく継承の順序であり、その継承（lineage）に沿って取得することが設計思想と一致する。
       </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-label">// 10 — Zenn記事の訴求点</div>
+    <h2>この経験から伝えたいこと</h2>
+    <div class="zenn-item">
+      <div class="zenn-num">①</div>
+      <div class="zenn-body"><strong>「なんか違う」を無視してきた</strong><br>入口は共感。品質エンジニアとして、あるいは人間として、言語化できない違和感を脇に置いてきた経験。</div>
+    </div>
+    <div class="zenn-item">
+      <div class="zenn-num">②</div>
+      <div class="zenn-body"><strong>なぜベクトル化しなかったか</strong><br>身体知は言語化の前にある。だからベクトル空間（意味の空間）での類似検索は、構造的に一致しない。</div>
+    </div>
+    <div class="zenn-item">
+      <div class="zenn-num">③</div>
+      <div class="zenn-body"><strong>このツールが解くのは何か（再定義）</strong><br>個人の直感を言語化して理解に繋げること。集合知ではなく個人知。過剰な主張を外し、今できることに誠実に。</div>
+    </div>
+    <div class="zenn-item">
+      <div class="zenn-num">④</div>
+      <div class="zenn-body"><strong>もしベクトル化したら何が得られ、何が失われるか</strong><br>読者の探求心を刺激する。「自分だったらどう設計するか」を考えさせる。</div>
+    </div>
+    <div class="zenn-item">
+      <div class="zenn-num">⑤</div>
+      <div class="zenn-body"><strong>制約が思想を生んだ</strong><br>「バックエンドなし・vanilla JS・GitHub Pages完結」という制約が、「なぜベクトル化しないか」という問いを産んだ。やってみた価値は、こうやって紡がれる。</div>
     </div>
   </section>
 
 </main>
 
 <div class="footer">
-  gut-rag design journal — updated in session<br>
+  gut-rag design journal — v4 updated<br>
   腸で感じた直感を、記録し、問いを通じて言語化する
 </div>
 
