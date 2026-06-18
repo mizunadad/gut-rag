@@ -460,6 +460,16 @@
   .apikey-indicator:hover { border-color: #252838; color: #7c8db0; }
   .apikey-indicator.set { color: #34d399; border-color: rgba(52,211,153,0.3); }
 
+  /* ── version badge ── */
+  .ver-badge {
+    position: fixed; bottom: 14px; right: 14px;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: var(--text3); letter-spacing: .08em;
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: 8px;
+    z-index: 100; pointer-events: none;
+  }
+
   /* ── exp context badge on s4 ── */
   .exp-badge {
     font-family: 'DM Mono', monospace; font-size: 10px;
@@ -941,10 +951,18 @@ ${knowContext}${meaningContext}${expContext}
 以下の形式で日本語で返してください：
 
 【気づき】
-（3〜4文。ユーザーの選択から見えてくる身体知・感覚の正体を、神経科学や哲学・仏教を自然に織り交ぜながら、詩的に言語化する。難しい言葉は使わない。${exp && exp.decided >= 2 ? 'ユーザーの過去の直感パターンが関連する場合は自然に織り込む。' : ''}）
+（3〜4文。ユーザーの選択から見えてくる身体知・感覚の正体を言語化する。
+ その感覚は「今この瞬間のもの」だけでなく、過去の経験・関係・記憶によって
+ 作りこまれた自我から来ている可能性も、やさしく織り込む。
+ 神経科学や哲学・仏教を自然に混ぜながら、詩的に。難しい言葉は使わない。${exp && exp.decided >= 2 ? ' ユーザーの過去の直感パターンが関連する場合は自然に織り込む。' : ''}）
 
 【次の問い】
-（1文。答えを求めず、さらに深い感覚へ誘う問い。）
+（1文。その感覚を生んでいるのは、過去の経験・関係・記憶によって作りこまれた自我かもしれない。
+ そこをやさしく照らすコーチングの問いにする。
+ 「それはいつ頃から？」「誰かから受け取った感覚では？」「以前も同じように感じたことがある？」
+ のように、具体的な場面・人・記憶へ向かう問いを選ぶ。
+ 五蘊でいえば「受」を「想」に引き上げる瞬間——「あ、そういえば」と思わせる1文にする。
+ 抽象的な内省ではなく、答えをイメージできる具体性を持たせること。）
 
 【問いの向き】
 （根・境・識のいずれか1語のみ。根＝身体・感覚器への問いなら「根」、境＝対象・何がへの問いなら「境」、識＝認識・意味づけへの問いなら「識」。）
@@ -1057,5 +1075,6 @@ function showKotobanSeed(cat) {
 // ── Init ──
 updateApikeyIndicator();
 </script>
+<div class="ver-badge">gut-socratic v4.1</div>
 </body>
 </html>

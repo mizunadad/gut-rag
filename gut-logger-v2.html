@@ -139,6 +139,16 @@
     cursor: pointer; transition: all 0.2s; margin-top: 8px;
   }
   .clear-all-btn:hover { border-color: var(--bad); color: var(--bad); }
+
+  /* ── version badge ── */
+  .ver-badge {
+    position: fixed; bottom: 14px; right: 14px;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: var(--text3); letter-spacing: .08em;
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: 8px;
+    z-index: 100; pointer-events: none;
+  }
   .export-btn {
     width: 100%; padding: 10px;
     border: 1px solid var(--border); border-radius: 10px;
@@ -1107,5 +1117,6 @@ function exportLogs() {
 renderLogs();
 loadSocraticNudge();
 </script>
+<div class="ver-badge">gut-logger v4.1</div>
 </body>
 </html>
