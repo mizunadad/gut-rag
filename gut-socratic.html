@@ -24,6 +24,13 @@
     --basho-glow: rgba(52,211,153,0.12);
     --mono-glow: rgba(96,165,250,0.12);
     --kokoro-glow: rgba(167,139,250,0.12);
+    /* Layer indicator colors */
+    --layer1: #4f9cf9;
+    --layer2: #a78bfa;
+    --layer3: #34d399;
+    --layer1-glow: rgba(79,156,249,0.10);
+    --layer2-glow: rgba(167,139,250,0.10);
+    --layer3-glow: rgba(52,211,153,0.10);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -368,6 +375,37 @@
     font-size: 10px; color: var(--text3);
     letter-spacing: 0.08em;
   }
+  /* layer indicator */
+  .kotoba-layer {
+    display: flex; align-items: center; gap: 6px;
+    padding: 12px 0 6px;
+  }
+  .layer-pip {
+    display: flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.06em;
+    border: 1px solid var(--border2);
+    color: var(--text3); transition: all 0.2s;
+  }
+  .layer-pip .pip-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text3); transition: all 0.2s;
+  }
+  .layer-pip-sep { font-size: 10px; color: var(--text3); opacity: 0.35; }
+  .layer-pip.active-L1 { border-color: var(--layer1); color: var(--layer1); background: var(--layer1-glow); }
+  .layer-pip.active-L1 .pip-dot { background: var(--layer1); }
+  .layer-pip.active-L2 { border-color: var(--layer2); color: var(--layer2); background: var(--layer2-glow); }
+  .layer-pip.active-L2 .pip-dot { background: var(--layer2); }
+  .layer-pip.active-L3 { border-color: var(--layer3); color: var(--layer3); background: var(--layer3-glow); }
+  .layer-pip.active-L3 .pip-dot { background: var(--layer3); }
+  .layer-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.05em;
+    color: var(--text3); padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border);
+  }
+
   .nav-back {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
@@ -584,6 +622,16 @@
     <hr class="kotoba-divider">
     <button class="kotoba-toggle" id="kotobaToggle" onclick="toggleKotoba()">▷ このことばの背景</button>
     <div id="kotobaBody" style="display:none">
+      <div id="kotobaLayer" style="display:none">
+       <div class="kotoba-layer">
+        <div class="layer-pip" id="layerPip1"><span class="pip-dot"></span>Layer 1</div>
+        <span class="layer-pip-sep">›</span>
+        <div class="layer-pip" id="layerPip2"><span class="pip-dot"></span>Layer 2</div>
+        <span class="layer-pip-sep">›</span>
+        <div class="layer-pip" id="layerPip3"><span class="pip-dot"></span>Layer 3</div>
+       </div>
+       <div class="layer-label" id="layerLabel"></div>
+      </div>
       <div class="kotoba-insight" id="kotobaInsight"></div>
       <div class="kotoba-resonance" id="kotobaResonance"></div>
       <div class="kotoba-source" id="kotobaSource"></div>
@@ -1073,15 +1121,36 @@ function showKotobanSeed(cat, emojiLabel) {
   if (typeof buildKnowledgeResonance !== 'function') return;
   const seed = buildKnowledgeResonance(cat, emojiLabel);
   if (!seed) return;
+
   document.getElementById('kotobaInsight').textContent   = seed.plain_insight;
   document.getElementById('kotobaResonance').textContent = seed.resonance_question;
   document.getElementById('kotobaSource').textContent    = '— ' + seed.title;
+
+  // ── Layer indicator ──
+  const layerSection = document.getElementById('kotobaLayer');
+  if (seed.layer) {
+    const layerLabels = {
+      'L1': '身体層 — 腸→脳の第一信号',
+      'L2': '統合層 — 感覚を意味に変える境界',
+      'L3': '意味層 — 実存・価値・行動の統合'
+    };
+    ['layerPip1', 'layerPip2', 'layerPip3'].forEach((id, i) => {
+      const pip = document.getElementById(id);
+      pip.className = 'layer-pip';
+      if (seed.layer === `L${i + 1}`) pip.classList.add(`active-L${i + 1}`);
+    });
+    document.getElementById('layerLabel').textContent = layerLabels[seed.layer] || '';
+    layerSection.style.display = 'block';
+  } else {
+    layerSection.style.display = 'none';
+  }
+
   document.getElementById('kotobaSection').style.display = 'block';
 }
 
 // ── Init ──
 updateApikeyIndicator();
 </script>
-<div class="ver-badge">gut-socratic v4.3</div>
+<div class="ver-badge">gut-socratic v4.4</div>
 </body>
 </html>

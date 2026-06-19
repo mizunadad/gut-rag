@@ -30,7 +30,8 @@ const KNOWLEDGE = [
     id: 'kotoba-001',
     title: '腑に落ちる',
     category: 'kotoba',
-    layer: 'L2',
+    layer: 'L1',
+	  mapId: 2,
     summary: '論理と身体感覚が一致した瞬間。頭ではなく内臓で「そうだ」と感じる状態。',
     body: '島皮質が身体感覚・感情・認知を統合するハブとして機能する。「わかったつもり」は前頭前皮質だけの処理。「腑に落ちた」は島皮質が加わり、身体が同意した状態。言語化の前に起きることが多く、後から「そうだったんだ」と気づく形をとる。',
     etymology: '腑＝内臓。理解が体の中心（はらわた）に届く感覚。',
@@ -50,6 +51,7 @@ const KNOWLEDGE = [
     title: '直感',
     category: 'kotoba',
     layer: 'L1',
+	  mapId: 1,
     summary: '経験が圧縮されて瞬時に現れる身体知。論理より速い。',
     body: '基底核が長年の経験をパターンとして圧縮・保存し、意識的な推論より遥かに速く作動する。「なぜかわからないがそう感じる」の正体は、基底核が過去の膨大な経験から導いた答え。精度は経験量に比例し、記録と振り返りによって鍛えられる。',
     etymology: '直に感じる。迂回なしに身体が知ること。',
@@ -69,6 +71,7 @@ const KNOWLEDGE = [
     title: '気配を読む',
     category: 'kotoba',
     layer: 'L2',
+	  mapId: 4,
     summary: '言語化される前の他者の状態や場の変化を身体で感知すること。',
     body: '上側頭溝と扁桃体が連携し、表情・声調・姿勢・空間の微細な変化を無意識に処理する。意識が気づく前に、身体はすでに反応している。「なんか様子がおかしい」はこの処理の結果。会議室に入った瞬間に感じる「今日は空気が違う」も同様の処理。',
     etymology: '気＝空気・雰囲気・エネルギー。配＝配られているもの。',
@@ -107,6 +110,7 @@ const KNOWLEDGE = [
     title: 'Gut never lies',
     category: 'kotoba',
     layer: 'L1',
+	  mapId: 3,
     summary: '腸（直感）は嘘をつかない。解釈が間違えることはあっても、感知自体は正直。',
     body: '腸神経系（ENS）は脳から独立した神経系を持ち、情動・文脈・身体状態の変化を敏感に捉え迷走神経を通じて脳に信号を送る。「腸が反応した」事実は正直。「それが何を意味するか」の解釈は学習で精度が上がる。だからこそ記録と振り返りが重要になる。',
     etymology: 'Gut＝腸・直感（英）。never lies＝嘘をつかない。',
@@ -145,6 +149,7 @@ const KNOWLEDGE = [
     title: '胆力',
     category: 'kotoba',
     layer: 'L3',
+	  mapId: 8,
     summary: '不確実な状況でも身体感覚を信頼して行動し続ける力。',
     body: '前頭前皮質が不確実性を処理し、島皮質が身体的な確信を担保する。胆力は「怖くない」ではなく「怖いが動ける」状態。経験の蓄積により直感の精度が上がり、その信頼感が胆力の基盤になる。腸への信頼と胆力は比例する。',
     etymology: '胆＝胆嚢・肝っ玉。力＝動く力。',
@@ -164,6 +169,7 @@ const KNOWLEDGE = [
     title: '間（ま）',
     category: 'kotoba',
     layer: 'L2',
+	  mapId: 6,
     summary: '人と人の間、行動と行動の間に生まれる余白。身体が作り出す時間と空間。',
     body: '上側頭溝は時間的・空間的な「間」を処理する脳領域。日本語の「間」は英語に直訳できない概念で、沈黙・呼吸・視線の間合いを含む。コミュニケーションにおける「間」の読み違えは関係の齟齬を生む。身体が自然に作る間と、頭で計算した間は質が異なる。',
     etymology: '間＝空間と時間の両方を指す日本語固有の概念。',
@@ -182,7 +188,8 @@ const KNOWLEDGE = [
     id: 'kotoba-009',
     title: '千里眼',
     category: 'kotoba',
-    layer: 'L3',
+    layer: 'L2',
+	  mapId: 5,
     summary: '遠くの状況や先の展開を身体感覚で先読みする力。',
     body: '前頭前皮質のシミュレーション能力と長期記憶（海馬）のパターン照合が組み合わさる。経験豊富な人が「なぜかそんな気がした」と言う現象の神経学的基盤。DMNが活性化するぼんやり・移動中などに浮かびやすい。意図的に考えるより、余白の中で現れる。',
     etymology: '千里＝遠い距離。眼＝見通す力。',
@@ -202,6 +209,7 @@ const KNOWLEDGE = [
     title: '人となり',
     category: 'kotoba',
     layer: 'L3',
+	  mapId: 7,
     summary: 'その人の言語化されない核心。言葉ではなく身体が感知する相手の本質。',
     body: '継続的な観察の中で島皮質・扁桃体・上側頭溝が統合して形成される印象。「なんとなく信頼できる」「なんか嫌な感じ」はこの処理の出力。論理的な評価より先に身体が判断していることが多い。長い時間をかけた相互作用の中で更新され続ける。',
     etymology: '人＝他者。となり＝そのもののあり方・本来の姿。',
@@ -730,7 +738,14 @@ function buildKnowledgeResonance(cat, emojiLabel) {
   for (const id of order) {
     const doc = KNOWLEDGE.find(d => d.id === id);
     if (doc && doc.plain_insight && doc.resonance_question) {
-      return { title: doc.title, plain_insight: doc.plain_insight, resonance_question: doc.resonance_question };
+	    #return { title: doc.title, plain_insight: doc.plain_insight, resonance_question: doc.resonance_question };
+      return {
+	      title: doc.title,
+	      plain_insight: doc.plain_insight,
+	      resonance_question: doc.resonance_question,
+	      layer: doc.layer || null,
+	      mapId: doc.mapId || null
+      };
     }
   }
   return null;
