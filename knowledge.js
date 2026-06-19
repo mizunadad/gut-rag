@@ -1,3 +1,6 @@
+// [knowledge.js] VERSION: NEW-v2 (brainAreas/summary対応)
+console.log("[knowledge.js] loaded: NEW-v2");
+
 /**
  * gut-rag 知識文書ライブラリ  knowledge.js
  *
