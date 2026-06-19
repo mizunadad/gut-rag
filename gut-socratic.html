@@ -1235,7 +1235,6 @@ function showKotobanSeed(cat, emojiLabel) {
   }
 
   // ── 参照カード ──
-  console.log('[gut-rag] seed:', seed.title, '| summary:', !!seed.summary, '| mechanism:', !!seed.mechanism, '| brainAreas:', !!seed.brainAreas);
   const refSection = document.getElementById('refSection');
   if (seed) {
     document.getElementById('refCard').innerHTML = buildRefCard(seed);
@@ -1243,10 +1242,8 @@ function showKotobanSeed(cat, emojiLabel) {
     document.getElementById('refToggle').textContent = '▷ 参照した知識カード';
     document.getElementById('refToggle').classList.remove('open');
     refSection.style.display = 'block';
-    console.log('[gut-rag] refSection: SHOW');
   } else {
     refSection.style.display = 'none';
-    console.log('[gut-rag] refSection: HIDE (no seed)');
   }
 
   document.getElementById('kotobaSection').style.display = 'block';
@@ -1255,6 +1252,6 @@ function showKotobanSeed(cat, emojiLabel) {
 // ── Init ──
 updateApikeyIndicator();
 </script>
-<div class="ver-badge">gut-socratic v4.5d</div>
+<div class="ver-badge">gut-socratic v4.5</div>
 </body>
 </html>
