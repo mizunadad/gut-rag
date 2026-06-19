@@ -375,6 +375,62 @@
     font-size: 10px; color: var(--text3);
     letter-spacing: 0.08em;
   }
+  /* ── 参照した知識カード ── */
+  .ref-toggle {
+    background: transparent; border: none;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em;
+    cursor: pointer; text-align: left;
+    padding: 10px 0 4px; transition: color 0.2s;
+    text-transform: uppercase; width: 100%;
+    border-top: 1px dashed var(--border);
+    margin-top: 10px; display: block;
+  }
+  .ref-toggle:hover { color: var(--text2); }
+  .ref-toggle.open  { color: var(--text2); }
+  .ref-body { padding: 14px 0 4px; }
+  .ref-title-row {
+    display: flex; align-items: baseline;
+    flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+  }
+  .ref-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.05rem; font-weight: 400; color: var(--text);
+  }
+  .ref-subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--text3); letter-spacing: 0.05em;
+  }
+  .ref-block { margin-bottom: 12px; }
+  .ref-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; margin-bottom: 5px;
+  }
+  .ref-label-L1 { color: var(--layer1); }
+  .ref-label-L2 { color: var(--layer2); }
+  .ref-label-L3 { color: var(--layer3); }
+  .ref-label-null { color: var(--text3); }
+  .ref-text {
+    font-size: 12px; color: var(--text2); line-height: 1.85;
+  }
+  .brain-chip {
+    display: inline-block;
+    padding: 3px 9px; border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; margin: 2px 3px 2px 0;
+  }
+  .chip-L1 { background: var(--layer1-glow); border: 1px solid rgba(79,156,249,0.3); color: var(--layer1); }
+  .chip-L2 { background: var(--layer2-glow); border: 1px solid rgba(167,139,250,0.3); color: var(--layer2); }
+  .chip-L3 { background: var(--layer3-glow); border: 1px solid rgba(52,211,153,0.3); color: var(--layer3); }
+  .chip-null { background: rgba(58,66,96,0.18); border: 1px solid var(--border2); color: var(--text3); }
+  .ref-coaching {
+    margin-top: 10px; padding: 11px 14px;
+    border-left: 2px solid var(--border2);
+    font-size: 12px; color: var(--text2); line-height: 1.85;
+  }
+
   /* layer indicator */
   .kotoba-layer {
     display: flex; align-items: center; gap: 6px;
@@ -634,6 +690,12 @@
         <div class="layer-pip" id="layerPip3"><span class="pip-dot"></span>Layer 3</div>
        </div>
        <div class="layer-label" id="layerLabel"></div>
+      </div>
+      <div id="refSection" style="display:none">
+        <button class="ref-toggle" id="refToggle" onclick="toggleRef()">▷ 参照した知識カード</button>
+        <div id="refBody" style="display:none">
+          <div id="refCard"></div>
+        </div>
       </div>
       <div class="kotoba-source" id="kotobaSource"></div>
     </div>
@@ -1109,6 +1171,32 @@ function showDemoBadge() {
 }
 
 // ── ことばの種 ──
+function buildRefCard(seed) {
+  const lc = seed.layer || 'null';
+  const lbl = `ref-label ref-label-${lc}`;
+  const chip = `brain-chip chip-${lc}`;
+  let h = `<div class="ref-title-row">
+    <span class="ref-title">${seed.title}</span>
+    ${seed.subtitle ? `<span class="ref-subtitle">${seed.subtitle}</span>` : ''}
+  </div>`;
+  if (seed.etymology) h += `<div class="ref-block"><div class="${lbl}">語源 / 意味</div><div class="ref-text">${seed.etymology}</div></div>`;
+  if (seed.summary)   h += `<div class="ref-block"><div class="${lbl}">要約</div><div class="ref-text">${seed.summary}</div></div>`;
+  if (seed.brainAreas?.length) h += `<div class="ref-block"><div class="${lbl}">脳部位</div><div>${seed.brainAreas.map(a=>`<span class="${chip}">${a}</span>`).join('')}</div></div>`;
+  if (seed.mechanism) h += `<div class="ref-block"><div class="${lbl}">神経メカニズム</div><div class="ref-text">${seed.mechanism}</div></div>`;
+  if (seed.abstract)  h += `<div class="ref-block"><div class="${lbl}">抽象度↑ — 上位概念</div><div class="ref-text">${seed.abstract}</div></div>`;
+  if (seed.coaching)  h += `<div class="ref-coaching">${seed.coaching}</div>`;
+  return h;
+}
+
+function toggleRef() {
+  const body   = document.getElementById('refBody');
+  const toggle = document.getElementById('refToggle');
+  const isOpen = body.style.display === 'block';
+  body.style.display = isOpen ? 'none' : 'block';
+  toggle.textContent = isOpen ? '▷ 参照した知識カード' : '▽ 参照した知識カード';
+  toggle.classList.toggle('open', !isOpen);
+}
+
 function toggleKotoba() {
   const body   = document.getElementById('kotobaBody');
   const toggle = document.getElementById('kotobaToggle');
@@ -1146,12 +1234,25 @@ function showKotobanSeed(cat, emojiLabel) {
     layerSection.style.display = 'none';
   }
 
+  // ── 参照カード ──
+  const refSection = document.getElementById('refSection');
+  const refHasData = seed.summary || seed.mechanism || seed.brainAreas;
+  if (refHasData) {
+    document.getElementById('refCard').innerHTML = buildRefCard(seed);
+    document.getElementById('refBody').style.display = 'none';
+    document.getElementById('refToggle').textContent = '▷ 参照した知識カード';
+    document.getElementById('refToggle').classList.remove('open');
+    refSection.style.display = 'block';
+  } else {
+    refSection.style.display = 'none';
+  }
+
   document.getElementById('kotobaSection').style.display = 'block';
 }
 
 // ── Init ──
 updateApikeyIndicator();
 </script>
-<div class="ver-badge">gut-socratic v4.4</div>
+<div class="ver-badge">gut-socratic v4.5</div>
 </body>
 </html>
