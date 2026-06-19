@@ -647,20 +647,81 @@ function buildMeaningKnowledge(topTags) {
 }
 
 /**
+ * emoji label → 優先知識文書ID マッピング（C案拡張）
+ * 選択した絵文字に応じてことばの種の文書を変える
+ */
+const EMOJI_KNOWLEDGE_MAP = {
+  // ── hito ──
+  'パートナー/恋人': ['kotoba-010', 'nou-004'],
+  '家族':            ['nou-003',    'kotoba-001'],
+  '自分自身':        ['tetsugaku-002', 'hannya-001'],
+  '旧友':            ['nou-002',    'kotoba-001'],
+  '同僚':            ['kotoba-003', 'nou-004'],
+  '上司/部下':       ['kotoba-007', 'tetsugaku-003'],
+  '仕事の誰か':      ['kotoba-003', 'kotoba-010'],
+  '取引相手':        ['kotoba-009', 'kotoba-007'],
+  '恩師/教え子':     ['tetsugaku-002', 'kotoba-012'],
+  '通りすがりの人':  ['kotoba-002', 'nou-004'],
+  // ── basho ──
+  '自然(山・海・公園など)': ['kotoba-008', 'nou-006'],
+  '家':              ['nou-003',    'kotoba-001'],
+  '都市':            ['kotoba-006', 'nou-004'],
+  '乗り物内(電車・車など)': ['nou-006', 'kotoba-014'],
+  '仕事場/学校':     ['kotoba-007', 'tetsugaku-003'],
+  '旅行先':          ['kotoba-002', 'nou-006'],
+  'いつもの店':      ['nou-002',    'kotoba-001'],
+  '静かな場所':      ['kotoba-008', 'hannya-001'],
+  '宇宙':            ['hannya-003', 'tetsugaku-004'],
+  '空想の世界':      ['hannya-003', 'tetsugaku-004'],
+  // ── mono ──
+  '言葉':            ['kotoba-005', 'tetsugaku-001'],
+  '思い出':          ['nou-002',    'hannya-003'],
+  '食・料理':        ['nou-001',    'kotoba-001'],
+  '道具':            ['kotoba-012', 'nou-002'],
+  '本':              ['tetsugaku-002', 'kotoba-005'],
+  '景色・光':        ['nou-003',    'kotoba-008'],
+  '音楽/芸術':       ['nou-003',    'kotoba-006'],
+  '動植物':          ['nou-001',    'tetsugaku-001'],
+  'スマホ':          ['tetsugaku-005', 'nou-005'],
+  '情報':            ['tetsugaku-005', 'kotoba-004'],
+  // ── kokoro ──
+  '穏やか':          ['nou-003',    'kotoba-001'],
+  'モヤモヤ':        ['kotoba-015', 'kotoba-004'],
+  'ざわざわ':        ['kotoba-006', 'nou-004'],
+  '重い':            ['tetsugaku-002', 'hannya-003'],
+  'ワクワク':        ['kotoba-013', 'nou-006'],
+  '熱い':            ['kotoba-007', 'nou-005'],
+  '空っぽ':          ['hannya-001', 'hannya-003'],
+  'ぼんやり':        ['nou-006',    'kotoba-014'],
+  '泣きたい':        ['tetsugaku-002', 'hannya-003'],
+  'うまく言えない':  ['kotoba-005', 'kotoba-014'],
+  'トキメキ':        ['kotoba-013', 'nou-003'],
+  '切ない':          ['tetsugaku-002', 'hannya-002'],
+  // ── 共通フォールバック ──
+  'なんとなく':      ['kotoba-014', 'kotoba-005'],
+  'その他':          ['kotoba-011', 'kotoba-014'],
+};
+
+/**
  * ことばの種（plain_insight + resonance_question）を取得
- * lineage 4件の中からカテゴリに最も関連する1件を返す
- * @param {string} cat - 'hito' | 'basho' | 'mono' | 'kokoro'
+ * emoji label がある場合はそれを優先、ない場合はカテゴリ順
+ * @param {string} cat
+ * @param {string} [emojiLabel]
  * @returns {{ title, plain_insight, resonance_question } | null}
  */
-function buildKnowledgeResonance(cat) {
-  // カテゴリ固有優先順位
+function buildKnowledgeResonance(cat, emojiLabel) {
+  // emoji label → 優先順位リスト
+  const emojiIds = emojiLabel ? (EMOJI_KNOWLEDGE_MAP[emojiLabel] || []) : [];
+
+  // カテゴリフォールバック順
   const catPriority = {
     hito:   ['tetsugaku-001', 'hannya-001', 'kotoba-011', 'nou-007'],
-    basho:  ['kotoba-011', 'nou-007', 'tetsugaku-001', 'hannya-001'],
-    mono:   ['tetsugaku-001', 'kotoba-011', 'nou-007', 'hannya-001'],
-    kokoro: ['hannya-001', 'nou-007', 'kotoba-011', 'tetsugaku-001'],
+    basho:  ['kotoba-011',    'nou-007',    'tetsugaku-001', 'hannya-001'],
+    mono:   ['tetsugaku-001', 'kotoba-011', 'nou-007',    'hannya-001'],
+    kokoro: ['hannya-001',    'nou-007',    'kotoba-011', 'tetsugaku-001'],
   };
-  const order = catPriority[cat] || ['hannya-001', 'tetsugaku-001', 'nou-007', 'kotoba-011'];
+  const order = [...emojiIds, ...(catPriority[cat] || [])];
+
   for (const id of order) {
     const doc = KNOWLEDGE.find(d => d.id === id);
     if (doc && doc.plain_insight && doc.resonance_question) {
