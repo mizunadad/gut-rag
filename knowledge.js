@@ -829,6 +829,7 @@ function buildKnowledgeResonance(cat, emojiLabel) {
     const doc = KNOWLEDGE.find(d => d.id === id);
     if (doc && doc.plain_insight && doc.resonance_question) {
       return {
+        id:                 doc.id,
         title:              doc.title,
         plain_insight:      doc.plain_insight,
         resonance_question: doc.resonance_question,
