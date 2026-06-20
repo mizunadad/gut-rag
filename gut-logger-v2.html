@@ -157,32 +157,6 @@
     cursor: pointer; transition: all 0.2s; margin-top: 8px;
   }
 .export-btn:hover { border-color: var(--signal); color: var(--signal); }
-
-  /* resonance chip on log card */
-  .resonance-row {
-    margin-top: 8px; padding-top: 8px;
-    border-top: 1px solid var(--border);
-    display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
-  }
-  .resonance-label {
-    font-size: 9px; font-family: 'DM Mono', monospace;
-    color: var(--text3); letter-spacing: 0.1em; flex-shrink: 0;
-  }
-  .resonance-chip {
-    font-size: 10px; padding: 3px 9px; border-radius: 10px;
-    border: 1px solid rgba(96,165,250,0.3);
-    color: rgba(96,165,250,0.7);
-    background: rgba(96,165,250,0.06);
-    font-family: 'DM Mono', monospace;
-    text-decoration: none; display: inline-block;
-    transition: all 0.18s;
-  }
-  a.resonance-chip:hover {
-    border-color: rgba(96,165,250,0.6);
-    color: rgba(96,165,250,1);
-    background: rgba(96,165,250,0.12);
-  }
-
   /* PATTERN TAB */
   .pattern-section { margin-bottom: 28px; }
   .pat-title {
@@ -472,6 +446,42 @@
     padding: 4px;
   }
   .nudge-close:hover { color: var(--text2); }
+
+  /* ── 共鳴チップ ── */
+  .resonance-row {
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  }
+  .resonance-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; padding: 3px 9px; border-radius: 10px;
+    border: 1px solid rgba(96,165,250,0.3);
+    background: rgba(96,165,250,0.07);
+    color: var(--pending);
+    font-family: 'DM Mono', monospace;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .resonance-chip:hover { border-color: rgba(96,165,250,0.6); background: rgba(96,165,250,0.15); }
+  .resonance-chip-static {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; padding: 3px 9px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text3); font-family: 'DM Mono', monospace;
+  }
+  /* ── Socratic リンク ── */
+  .socratic-link {
+    display: inline-block; margin-top: 6px;
+    font-size: 10px; font-family: 'DM Mono', monospace;
+    color: var(--text3); padding: 3px 10px;
+    border: 1px solid var(--border); border-radius: 10px;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .socratic-link:hover {
+    border-color: rgba(167,139,250,0.5);
+    color: rgba(167,139,250,0.9);
+    background: rgba(167,139,250,0.07);
+  }
 </style>
 </head>
 <body>
@@ -960,18 +970,17 @@ function renderLogs() {
           ${log.meaning.tags.map(t => `<span class="meaning-chip-display">${t}</span>`).join('')}
           ${log.meaning.note ? `<span class="meaning-note-display">"${log.meaning.note}"</span>` : ''}
         </div>` : ''}
-      ${log.resonance ? `
-        <div class="resonance-row">
-          <span class="resonance-label">共鳴</span>
-          ${log.resonance.layer
-            ? `<a class="resonance-chip" href="gut-brain-map.html${
-                log.resonance.mapNodeId
-                  ? '#map-card-' + log.resonance.mapNodeId
-                  : ''
-              }">${log.resonance.title} →</a>`
-            : `<span class="resonance-chip">${log.resonance.title}</span>`
-          }
-        </div>` : ''}`;
+      ${log.resonance ? (() => {
+        const r = log.resonance;
+        if (r.mapId) {
+          return `<div class="resonance-row"><a class="resonance-chip" href="gut-brain-map.html#map-card-${r.mapId}">🗺 ${r.title}</a></div>`;
+        } else if (r.layer) {
+          return `<div class="resonance-row"><a class="resonance-chip" href="gut-brain-map.html">🗺 ${r.title}</a></div>`;
+        } else {
+          return `<div class="resonance-row"><span class="resonance-chip-static">💭 ${r.title}</span></div>`;
+        }
+      })() : ''}
+      <div><a class="socratic-link" href="gut-socratic.html?logId=${log.id}">⟳ Socraticで問いを深める</a></div>`;
     list.appendChild(card);
   });
 }
@@ -1155,6 +1164,6 @@ function exportLogs() {
 renderLogs();
 loadSocraticNudge();
 </script>
-<div class="ver-badge">gut-logger v4.3</div>
+<div class="ver-badge">gut-logger v4.4</div>
 </body>
 </html>

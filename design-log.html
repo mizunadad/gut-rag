@@ -479,49 +479,72 @@
   <hr class="divider">
 
   <section>
-    <div class="sec-label">// ADR-006 — 採択済み</div>
+    <div class="sec-label">// 11 — ADR-006：lineage retrieval の実証</div>
     <h2>ログは感情日記ではなく、決定木の通過記録である</h2>
-    <div class="card">
-      <div class="card-title">// CONTEXT</div>
-      <div class="card-body">
-        gut-loggerの記録はemojiと文脈・結果のみだった。Socraticセッションで「どの文書が、どの哲学的登録で、地図上のどのノードと共鳴したか」が記録されていなかった。<br><br>
-        また、knowledge.jsとgut-brain-mapは完全に独立したデータを持ち、対応関係が暗黙的だった。新しい文書を追加した際にどちらかを更新し忘れると矛盾が拡大する。
+    <div class="insight">
+      <div class="insight-text">
+        <em>「感じられないものは選ばれない」</em>——lineage retrieval の設計原則が実証された。
       </div>
     </div>
     <div class="card">
-      <div class="card-title">// DECISION</div>
+      <div class="card-title">Dead Node 分析（全31件中）</div>
       <div class="card-body">
-        <strong>① knowledge.js に mapNodeId フィールドを追加</strong><br>
-        gut-brain-map の cards[].id に対応する文書に mapNodeId を付与。対応なし = null。これを単一の対応表として管理する。<br><br>
-        <strong>② 書き戻しスキーマに mapNodeId を追加</strong><br>
-        <div class="code">gut_logs[].resonance = {<br>
-&nbsp;&nbsp;docId, title, layer, mapNodeId, ts<br>
-}</div>
-        <strong>③ 共鳴チップをナビゲーションリンクに変更</strong><br>
-        mapNodeId あり → gut-brain-map.html#map-card-{N}（ノード直接）<br>
-        layer のみ  → gut-brain-map.html（マップトップ）<br>
-        layer null  → リンクなし（仏教・哲学文書）
+        lineage retrieval は決定論的探索。EMOJI_MAP と MEANING_MAP で到達できるノードは確定的に決まる。<br><br>
+        Dead Node はわずか2件：<br>
+        ・<strong>nou-007「3層構造・全体」</strong>— 概念の説明文書。身体で感じる対象ではない<br>
+        ・<strong>hannya-004「般若心経・概要」</strong>— 概要は到達不能。具体的概念はすべて到達可能<br><br>
+        残り29件はすべて、具体的な感覚・文脈・意味タグから到達できる。<br>
+        「感じられないものは選ばれない」という原則と完全に一致。
       </div>
     </div>
     <div class="card">
-      <div class="card-title">// CONSEQUENCES +</div>
+      <div class="card-title">lineage retrieval = 決定論的探索</div>
       <div class="card-body">
-        ログが「感覚入力 → 文書(docId) → 哲学的登録(layer) → 地図の位置(mapNodeId)」の完全な決定木通過記録になる。<br><br>
-        <strong>Dead Nodeが明示される</strong>：現在2件（nou-007「3層構造・全体」/ hannya-004「般若心経・概要」）。これらは概要・説明文書であり、身体で感じる対象ではないため、どの感覚入力にも紐付かない。<strong>「感じられないものは選ばれない」</strong>という lineage retrieval の設計原則が実証可能になった。<br><br>
-        蓄積されると「どの哲学的フレームに自分はよく共鳴するか」というパターンが見える。これは他のどのアプリも記録していない個人の身体知フィンガープリント。
+        <div class="code">vector search     = 確率論的（類似度で揺れる）<br>
+lineage retrieval = 決定論的（EMOJI_MAPで確定）</div>
+        LLMはその文書の文脈の中だけで「解釈」する。「探索」しない。<br>
+        ガードレール設計：手描きの対応表（MAP）が、LLMの動ける空間を構造的に限定する。
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-label">// 12 — ADR-007：1ログ1共鳴・上書き</div>
+    <h2>gut-ragは過去の記録庫ではなく、身体知の「現在」を映す鏡である</h2>
+    <div class="insight">
+      <div class="insight-text">
+        <em>腸の信号は「今」しか語らない。上書きは劣化ではなく更新。</em>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">// CONSEQUENCES −</div>
+      <div class="card-title">設計原則</div>
       <div class="card-body">
-        gut-brain-map に新ノードを追加するとき、knowledge.js の mapNodeId も同期が必要。<br>
-        → 対応表は knowledge.js の一箇所に集約されているため、見落としは発生しにくい。
+        1ログに対して共鳴は1件のみ。Socraticセッションを新たに行うと上書きされる。<br>
+        これは欠陥ではなく、意図的な設計。<br><br>
+        <strong>なぜ上書きか：</strong><br>
+        ・腸の信号は今この瞬間のものを語る<br>
+        ・蓄積される「共鳴の地図」は、最新の理解が反映された状態が正しい<br>
+        ・カード数（記録数）が鏡の解像度になる
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">logId による書き戻し先の特定（v4.4/v4.9）</div>
+      <div class="card-body">
+        gut-loggerの各ログカードから「Socraticで問いを深める」をタップすると、<br>
+        URLパラメータ <span class="code" style="display:inline;padding:2px 6px;font-size:10px">?logId=XXXXXXX</span> が付与される。<br><br>
+        gut-socraticはこのlogIdをURLから読み取り、<br>
+        対象のログに直接 resonance を書き戻す。<br><br>
+        <strong>localStorage スキーマ（resonance フィールド）：</strong>
+        <div class="code">{ docId, title, layer, mapId, ts }</div>
+        mapId が存在する場合、共鳴チップから gut-brain-map の該当ノードへ直接ジャンプ。
       </div>
     </div>
   </section>
 
 <div class="footer">
-  gut-rag design journal — v5 updated<br>
+  gut-rag design journal — v6 updated<br>
   腸で感じた直感を、記録し、問いを通じて言語化する
 </div>
 

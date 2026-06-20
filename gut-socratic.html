@@ -741,6 +741,9 @@
 <script src="demo_responses.js"></script>
 <script src="knowledge.js"></script>
 <script>
+// ── logId（gut-loggerからの遷移で書き戻し先を特定）──
+const _logId = new URLSearchParams(location.search).get('logId');
+
 // ── Data ──
 const EMOJIS = {
   hito: [
@@ -1263,19 +1266,21 @@ function showKotobanSeed(cat, emojiLabel) {
   }
 
   // ── 共鳴書き戻し（gut-logger 接続）──
-  // Socratic セッションで使用した knowledge ドキュメントを
-  // gut_logs の直近記録に resonance フィールドとして書き込む
+  // logId があれば対象ログに、なければ最新ログに書き戻す
   try {
     const rawLogs = localStorage.getItem('gut_logs');
     if (rawLogs) {
       const allLogs = JSON.parse(rawLogs);
       if (allLogs.length > 0) {
-        allLogs[0].resonance = {
-          docId:     seed.id,
-          title:     seed.title,
-          layer:     seed.layer     || null,
-          mapNodeId: seed.mapNodeId || null,
-          ts:        Date.now()
+        const target = _logId
+          ? (allLogs.find(l => String(l.id) === String(_logId)) || allLogs[0])
+          : allLogs[0];
+        target.resonance = {
+          docId:  seed.id,
+          title:  seed.title,
+          layer:  seed.layer || null,
+          mapId:  seed.mapId  || null,
+          ts:     Date.now()
         };
         localStorage.setItem('gut_logs', JSON.stringify(allLogs));
       }
@@ -1288,6 +1293,6 @@ function showKotobanSeed(cat, emojiLabel) {
 // ── Init ──
 updateApikeyIndicator();
 </script>
-<div class="ver-badge">gut-socratic v4.8</div>
+<div class="ver-badge">gut-socratic v4.9</div>
 </body>
 </html>
