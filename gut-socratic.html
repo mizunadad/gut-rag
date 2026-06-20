@@ -1271,10 +1271,11 @@ function showKotobanSeed(cat, emojiLabel) {
       const allLogs = JSON.parse(rawLogs);
       if (allLogs.length > 0) {
         allLogs[0].resonance = {
-          docId:  seed.id,
-          title:  seed.title,
-          layer:  seed.layer || null,
-          ts:     Date.now()
+          docId:     seed.id,
+          title:     seed.title,
+          layer:     seed.layer     || null,
+          mapNodeId: seed.mapNodeId || null,
+          ts:        Date.now()
         };
         localStorage.setItem('gut_logs', JSON.stringify(allLogs));
       }
@@ -1287,6 +1288,6 @@ function showKotobanSeed(cat, emojiLabel) {
 // ── Init ──
 updateApikeyIndicator();
 </script>
-<div class="ver-badge">gut-socratic v4.7</div>
+<div class="ver-badge">gut-socratic v4.8</div>
 </body>
 </html>

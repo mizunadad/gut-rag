@@ -27,7 +27,7 @@ const KNOWLEDGE = [
   // ══════════════════════════════════════
 
   {
-    id: 'kotoba-001',
+    id: 'kotoba-001', mapNodeId: 2,
     title: '腑に落ちる',
     category: 'kotoba',
     layer: 'L1',
@@ -52,7 +52,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-002',
+    id: 'kotoba-002', mapNodeId: 1,
     title: '直感',
     category: 'kotoba',
     layer: 'L1',
@@ -77,7 +77,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-003',
+    id: 'kotoba-003', mapNodeId: 4,
     title: '気配を読む',
     category: 'kotoba',
     layer: 'L2',
@@ -121,7 +121,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-005',
+    id: 'kotoba-005', mapNodeId: 3,
     title: 'Gut never lies',
     category: 'kotoba',
     layer: 'L1',
@@ -165,7 +165,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-007',
+    id: 'kotoba-007', mapNodeId: 8,
     title: '胆力',
     category: 'kotoba',
     layer: 'L3',
@@ -190,7 +190,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-008',
+    id: 'kotoba-008', mapNodeId: 6,
     title: '間（ま）',
     category: 'kotoba',
     layer: 'L2',
@@ -215,7 +215,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-009',
+    id: 'kotoba-009', mapNodeId: 5,
     title: '千里眼',
     category: 'kotoba',
     layer: 'L2',
@@ -240,7 +240,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-010',
+    id: 'kotoba-010', mapNodeId: 7,
     title: '人となり',
     category: 'kotoba',
     layer: 'L3',
@@ -360,7 +360,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-016',
+    id: 'kotoba-016', mapNodeId: 9,
     title: '徳・アレテー',
     category: 'kotoba',
     layer: 'L3',
@@ -385,7 +385,7 @@ const KNOWLEDGE = [
   },
 
   {
-    id: 'kotoba-017',
+    id: 'kotoba-017', mapNodeId: 10,
     title: '只管打坐的確信',
     category: 'kotoba',
     layer: 'L3',
