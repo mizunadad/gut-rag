@@ -1,4 +1,4 @@
-const CACHE = 'gut-rag-v24';
+const CACHE = 'gut-rag-v25';
 const FILES = [
   '/gut-rag/',
   '/gut-rag/index.html',
