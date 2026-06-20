@@ -157,6 +157,8 @@
     cursor: pointer; transition: all 0.2s; margin-top: 8px;
   }
 .export-btn:hover { border-color: var(--signal); color: var(--signal); }
+  .import-btn { color: var(--pending); border-color: var(--border); }
+  .import-btn:hover { border-color: var(--pending); color: var(--pending); }
   /* PATTERN TAB */
   .pattern-section { margin-bottom: 28px; }
   .pat-title {
@@ -580,7 +582,11 @@
       <button class="page-btn" id="pageNext" onclick="changePage(1)">次へ →</button>
     </div>
     <button class="clear-all-btn" id="clearAllBtn" onclick="confirmClearAll()" style="display:none">すべての記録を削除する</button>
-    <button class="export-btn" onclick="exportLogs()" style="margin-top:8px">↓ 記録を JSON でエクスポート</button>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="export-btn" onclick="exportLogs()" style="flex:1">↓ エクスポート</button>
+      <button class="export-btn import-btn" onclick="triggerImport()" style="flex:1">↑ インポート</button>
+    </div>
+    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(event)">
   </div>
   <div class="panel" id="tab-pattern">
     <div class="accuracy-row" id="accRow"></div>
@@ -1001,7 +1007,11 @@ function confirmClearAll() {
   };
   document.getElementById('confirmOverlay').classList.add('active');
 }
-function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('active'); confirmCallback = null; }
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('active');
+  document.getElementById('confirmOkBtn').textContent = '削除する';
+  confirmCallback = null;
+}
 function execConfirm() { if (confirmCallback) confirmCallback(); closeConfirm(); }
 
 // ── Log render ──
@@ -1325,6 +1335,46 @@ function dismissNudge() {
   try { localStorage.removeItem('gut_next_q'); } catch(_) {}
 }
 
+function triggerImport() {
+  document.getElementById('importFileInput').click();
+}
+
+function handleImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = ''; // reset so same file can be re-selected
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.logs || !Array.isArray(data.logs)) {
+        showToast('ファイル形式が正しくありません');
+        return;
+      }
+      const importCount = data.logs.length;
+      const currentCount = logs.length;
+
+      document.getElementById('confirmTitle').textContent = 'JSONからインポートしますか？';
+      document.getElementById('confirmSub').textContent =
+        `現在の記録（${currentCount}件）を、インポートした記録（${importCount}件）で上書きします。この操作は取り消せません。`;
+      document.getElementById('confirmOkBtn').textContent = 'インポートする';
+
+      confirmCallback = () => {
+        logs = data.logs.map(l => ({ ...l, time: new Date(l.time) }));
+        currentPage = 0;
+        saveLogs();
+        renderLogs();
+        showToast(`${importCount}件をインポートしました 🫀`);
+      };
+      document.getElementById('confirmOverlay').classList.add('active');
+    } catch(_) {
+      showToast('JSONの読み込みに失敗しました');
+    }
+  };
+  reader.readAsText(file);
+}
+
 function exportLogs() {
   const data = {
     profile: profile || {},
@@ -1347,6 +1397,6 @@ function exportLogs() {
 renderLogs();
 loadSocraticNudge();
 </script>
-<div class="ver-badge">gut-logger v4.6</div>
+<div class="ver-badge">gut-logger v4.7</div>
 </body>
 </html>
