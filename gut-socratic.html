@@ -430,6 +430,15 @@
     border-left: 2px solid var(--border2);
     font-size: 12px; color: var(--text2); line-height: 1.85;
   }
+  .ref-map-link {
+    display: inline-block; margin-top: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--layer2); text-decoration: none;
+    border-bottom: 1px solid rgba(167,139,250,0.3);
+    padding-bottom: 1px; transition: color 0.2s;
+  }
+  .ref-map-link:hover { color: var(--layer1); }
 
   /* layer indicator */
   .kotoba-layer {
@@ -1185,6 +1194,7 @@ function buildRefCard(seed) {
   if (seed.mechanism) h += `<div class="ref-block"><div class="${lbl}">神経メカニズム</div><div class="ref-text">${seed.mechanism}</div></div>`;
   if (seed.abstract)  h += `<div class="ref-block"><div class="${lbl}">抽象度↑ — 上位概念</div><div class="ref-text">${seed.abstract}</div></div>`;
   if (seed.coaching)  h += `<div class="ref-coaching">${seed.coaching}</div>`;
+  if (seed.mapId)     h += `<a class="ref-map-link" href="gut-brain-map.html#map-card-${seed.mapId}" target="_blank">身体知マップで見る →</a>`;
   return h;
 }
 

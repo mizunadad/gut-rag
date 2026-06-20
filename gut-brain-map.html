@@ -135,7 +135,23 @@
     opacity: 0;
     transition: opacity 0.25s;
   }
-  .card.l1::before { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card.highlight-from-socratic {
+    box-shadow: 0 0 0 2px var(--accent1), 0 12px 40px rgba(0,0,0,0.5);
+    transition: box-shadow 0.4s ease;
+  }
+  /* 戻るボタン */
+  #backToSocratic {
+    display: none;
+    position: fixed; top: 16px; left: 16px; z-index: 100;
+    padding: 8px 14px; border-radius: 20px;
+    background: rgba(15,16,24,0.85); backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    color: var(--text-secondary); font-size: 13px;
+    text-decoration: none; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  #backToSocratic:hover { border-color: var(--accent1); color: var(--text-primary); }
+
   .card.l2::before { background: linear-gradient(90deg, var(--accent2), transparent); }
   .card.l3::before { background: linear-gradient(90deg, var(--accent3), transparent); }
 
@@ -383,6 +399,7 @@
 </style>
 </head>
 <body>
+<a id="backToSocratic" href="gut-socratic.html">← 元の画面に戻る</a>
 
 <header>
   <div class="eyebrow">Embodied Intelligence × Neuroscience</div>
@@ -631,6 +648,7 @@ function renderCards(filter) {
   grid.innerHTML = '';
   cards.forEach(card => {
     const el = document.createElement('div');
+    el.id = 'map-card-' + card.id;
     const isVisible = filter === 'all' || card.layer === filter;
     el.className = `card ${card.layer}${expandedCard === card.id ? ' expanded' : ''}${!isVisible ? ' dimmed' : ''}`;
     el.innerHTML = `
@@ -704,6 +722,31 @@ function filterLayer(layer) {
 
 // Init
 renderCards('all');
+
+// ── Hash ナビゲーション（gut-socratic.html からのリンク対応）──
+(function() {
+  const hash = window.location.hash; // e.g. "#map-card-4"
+  if (!hash || !hash.startsWith('#map-card-')) return;
+
+  const targetId = parseInt(hash.replace('#map-card-', ''), 10);
+  if (!targetId) return;
+
+  // 戻るボタンを表示
+  document.getElementById('backToSocratic').style.display = 'block';
+
+  // カードを展開して再描画
+  expandedCard = targetId;
+  renderCards('all');
+
+  // スクロール＋ハイライト
+  setTimeout(() => {
+    const el = document.getElementById('map-card-' + targetId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('highlight-from-socratic');
+    setTimeout(() => el.classList.remove('highlight-from-socratic'), 2500);
+  }, 120);
+})();
 </script>
 </body>
 </html>
