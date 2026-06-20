@@ -524,6 +524,23 @@
   .resonance-doc-chip.layer-float {
     border-color: var(--border2); color: var(--text3); background: var(--surface2);
   }
+
+  /* ── ページング ── */
+  .pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 10px 0 4px; padding: 0 2px;
+  }
+  .page-btn {
+    padding: 6px 16px; border-radius: 10px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text3); font-family: 'DM Mono', monospace;
+    font-size: 11px; cursor: pointer; transition: all 0.2s;
+  }
+  .page-btn:hover:not(:disabled) { border-color: var(--border2); color: var(--text2); }
+  .page-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+  .page-info {
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3);
+  }
 </style>
 </head>
 <body>
@@ -546,6 +563,7 @@
   <div class="tabs">
     <button class="tab active" onclick="switchTab('log',this)">記録</button>
     <button class="tab" onclick="switchTab('pattern',this)">パターン</button>
+    <button class="tab" onclick="switchTab('resonance',this)">共鳴</button>
   </div>
   <div class="panel active" id="tab-log">
     <button class="capture-btn" onclick="openModal()">
@@ -556,7 +574,13 @@
       </div>
     </button>
     <div id="logList"></div>
+    <div class="pagination" id="paginationRow" style="display:none">
+      <button class="page-btn" id="pagePrev" onclick="changePage(-1)">← 前へ</button>
+      <span class="page-info" id="pageInfo"></span>
+      <button class="page-btn" id="pageNext" onclick="changePage(1)">次へ →</button>
+    </div>
     <button class="clear-all-btn" id="clearAllBtn" onclick="confirmClearAll()" style="display:none">すべての記録を削除する</button>
+    <button class="export-btn" onclick="exportLogs()" style="margin-top:8px">↓ 記録を JSON でエクスポート</button>
   </div>
   <div class="panel" id="tab-pattern">
     <div class="accuracy-row" id="accRow"></div>
@@ -569,14 +593,9 @@
       <div class="pat-title">// 腸のクセ — 上位パターン</div>
       <div id="insightList"></div>
     </div>
-    <div class="pattern-section" style="margin-top:28px;">
-      <div class="pat-title">// データを保存する</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.7">
-        端末変更・ブラウザリセット前に書き出しておく。
-      </div>
-      <button class="export-btn" onclick="exportLogs()">↓ 記録を JSON でエクスポート</button>
-    </div>
-    <div class="pattern-section" style="margin-top:28px;">
+  </div>
+  <div class="panel" id="tab-resonance">
+    <div class="pattern-section">
       <div class="pat-title">// 共鳴の地図</div>
       <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.7">
         Socraticセッションで響いた知識の層と文書。
@@ -733,6 +752,8 @@ let draft = {feel:null, context:null, note:''};
 let meaningDraft = {id: null, result: null, tags: [], note: ''};
 let nextId = Date.now();
 let confirmCallback = null;
+const PAGE_SIZE = 10;
+let currentPage = 0;
 
 // ── Onboarding ──
 function checkOnboard() {
@@ -775,7 +796,8 @@ function switchTab(name, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
-  if (name === 'pattern') { renderPattern(); renderResonanceMap(); }
+  if (name === 'pattern')   { renderPattern(); }
+  if (name === 'resonance') { renderResonanceMap(); }
 }
 function fmtTime(d) {
   const days = ['日','月','火','水','木','金','土'];
@@ -873,6 +895,7 @@ function saveLog() {
     time: new Date(),
     result: 'pending'
   });
+  currentPage = 0;
   saveLogs();
   closeModal();
   renderLogs();
@@ -985,19 +1008,28 @@ function execConfirm() { if (confirmCallback) confirmCallback(); closeConfirm();
 function renderLogs() {
   const list = document.getElementById('logList');
   const clearBtn = document.getElementById('clearAllBtn');
+  const paginationRow = document.getElementById('paginationRow');
   if (!logs.length) {
     list.innerHTML = `<div class="empty">まだ記録がありません。<br>「なんか」を感じたら押してください。</div>`;
     clearBtn.style.display = 'none';
+    paginationRow.style.display = 'none';
     return;
   }
   clearBtn.style.display = 'block';
+
+  // ページ範囲
+  const totalPages = Math.ceil(logs.length / PAGE_SIZE);
+  if (currentPage >= totalPages) currentPage = totalPages - 1;
+  const start = currentPage * PAGE_SIZE;
+  const pageItems = logs.slice(start, start + PAGE_SIZE);
+
   const badge = {
     pending: '<span class="result-badge pending">結果まち</span>',
     confirmed: '<span class="result-badge confirmed">当たった</span>',
     missed: '<span class="result-badge missed">外れた</span>'
   };
   list.innerHTML = '';
-  logs.slice(0, 20).forEach(log => {
+  pageItems.forEach(log => {
     const card = document.createElement('div');
     card.className = 'log-card';
     card.innerHTML = `
@@ -1034,6 +1066,23 @@ function renderLogs() {
       <div><a class="socratic-link" href="gut-socratic.html?logId=${log.id}">⟳ Socraticで問いを深める</a></div>`;
     list.appendChild(card);
   });
+
+  // ページング表示
+  if (logs.length > PAGE_SIZE) {
+    paginationRow.style.display = 'flex';
+    document.getElementById('pagePrev').disabled = currentPage === 0;
+    document.getElementById('pageNext').disabled = currentPage >= totalPages - 1;
+    document.getElementById('pageInfo').textContent = `${currentPage + 1} / ${totalPages}`;
+  } else {
+    paginationRow.style.display = 'none';
+  }
+}
+
+function changePage(dir) {
+  const totalPages = Math.ceil(logs.length / PAGE_SIZE);
+  currentPage = Math.max(0, Math.min(totalPages - 1, currentPage + dir));
+  renderLogs();
+  window.scrollTo(0, 0);
 }
 
 // ── Pattern render ──
@@ -1298,6 +1347,6 @@ function exportLogs() {
 renderLogs();
 loadSocraticNudge();
 </script>
-<div class="ver-badge">gut-logger v4.5</div>
+<div class="ver-badge">gut-logger v4.6</div>
 </body>
 </html>
