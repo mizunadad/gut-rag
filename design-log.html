@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>腸で考えるRAG — 設計ジャーナル</title>
+<title>腸で考えるRAG — 設計判断の記録</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400&family=Noto+Sans+JP:wght@300;400&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap');
   :root {
@@ -29,36 +29,32 @@
   .h-kotoba{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--kotoba);}
   .h-rag{background:rgba(229,229,231,.06);border:1px solid var(--border2);color:var(--text2);}
   main{max-width:780px;margin:0 auto;padding:0 24px;}
-  section{margin-bottom:48px;}
+  section{margin-bottom:56px;}
   .sec-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--text3);margin-bottom:16px;}
   h2{font-family:'Noto Serif JP',serif;font-size:1.2rem;font-weight:400;margin-bottom:20px;color:var(--text);}
-  p{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.9;}
-  .card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;margin-bottom:12px;}
+  .card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;margin-top:12px;}
   .card-title{font-size:13px;font-weight:400;margin-bottom:8px;color:var(--text);}
   .card-body{font-size:12px;color:var(--text2);line-height:1.8;}
   .card-body strong{color:var(--text);font-weight:400;}
-  .status-table{width:100%;border-collapse:collapse;font-size:12px;}
-  .status-table th{text-align:left;color:var(--text3);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 12px;border-bottom:1px solid var(--border);}
-  .status-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text2);}
-  .status-table tr:last-child td{border-bottom:none;}
-  .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;font-family:'DM Mono',monospace;}
-  .done{background:rgba(52,211,153,.12);color:var(--good);border:1px solid rgba(52,211,153,.25);}
-  .partial{background:rgba(245,158,11,.12);color:var(--signal);border:1px solid rgba(245,158,11,.25);}
-  .notyet{background:rgba(248,113,113,.1);color:var(--bad);border:1px solid rgba(248,113,113,.2);}
-  .plan-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;}
-  .plan-num{font-family:'DM Mono',monospace;font-size:20px;color:var(--text3);line-height:1;padding-top:4px;min-width:28px;}
-  .plan-num.done-num{color:var(--good);}
-  .plan-content .plan-title{font-size:13px;color:var(--text);margin-bottom:6px;}
-  .plan-content .plan-desc{font-size:12px;color:var(--text2);line-height:1.8;}
   .divider{border:none;border-top:1px solid var(--border);margin:40px 0;}
-  .insight{border-left:2px solid var(--signal);padding:14px 18px;background:rgba(245,158,11,.04);border-radius:0 8px 8px 0;margin-bottom:16px;}
+  .insight{border-left:2px solid var(--signal);padding:14px 18px;background:rgba(245,158,11,.04);border-radius:0 8px 8px 0;margin-bottom:20px;}
   .insight-text{font-size:13px;color:var(--text2);line-height:1.9;}
   .insight-text em{color:var(--text);font-style:normal;}
-  .zenn-item{display:flex;gap:14px;margin-bottom:14px;}
-  .zenn-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--signal);min-width:24px;padding-top:2px;}
-  .zenn-body{font-size:12px;color:var(--text2);line-height:1.8;}
-  .zenn-body strong{color:var(--text);font-weight:400;}
-  .footer{text-align:center;padding:40px 24px 0;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);}
+  /* Goal専用 */
+  .goal-box{border-left:2px solid var(--hannya);padding:14px 18px;background:rgba(167,139,250,.04);border-radius:0 8px 8px 0;margin-bottom:20px;}
+  .goal-text{font-size:13px;color:var(--text2);line-height:1.9;}
+  .goal-text em{color:var(--text);font-style:normal;}
+  .axis-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+  .axis-card{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;}
+  .axis-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text3);margin-bottom:8px;}
+  .axis-body{font-size:12px;color:var(--text2);line-height:1.8;}
+  .axis-body strong{color:var(--text);font-weight:400;}
+  .goal-note{font-size:12px;color:var(--text3);margin-top:14px;font-style:italic;line-height:1.8;}
+  /* sw警告 */
+  .warn-box{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px 18px;margin-bottom:12px;}
+  .warn-box .warn-title{font-size:12px;color:var(--bad);margin-bottom:6px;font-family:'DM Mono',monospace;}
+  .warn-box .warn-body{font-size:12px;color:var(--text2);line-height:1.8;}
+  .code{font-family:'DM Mono',monospace;font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin:10px 0;color:var(--good);line-height:1.7;}
   /* 螺旋図 */
   .spiral{display:flex;flex-direction:column;gap:0;margin:20px 0;}
   .spiral-row{display:flex;align-items:center;gap:12px;padding:10px 0;}
@@ -70,21 +66,33 @@
   .s-nudge{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--signal);}
   .spiral-arrow{color:var(--text3);font-size:18px;line-height:1;}
   .spiral-label{font-size:11px;color:var(--text3);}
-  /* sw warning box */
-  .warn-box{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px 18px;margin-bottom:12px;}
-  .warn-box .warn-title{font-size:12px;color:var(--bad);margin-bottom:6px;font-family:'DM Mono',monospace;}
-  .warn-box .warn-body{font-size:12px;color:var(--text2);line-height:1.8;}
-  .code{font-family:'DM Mono',monospace;font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin:10px 0;color:var(--good);line-height:1.7;}
+  /* ADR */
+  .adr-header{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .adr-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:.1em;}
+  .status-badge{font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:8px;}
+  .status-adopted{background:rgba(52,211,153,.12);color:var(--good);border:1px solid rgba(52,211,153,.25);}
+  .status-pending{background:rgba(245,158,11,.12);color:var(--signal);border:1px solid rgba(245,158,11,.25);}
+  .status-deprecated{background:rgba(248,113,113,.1);color:var(--bad);border:1px solid rgba(248,113,113,.2);}
+  .adr-card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;}
+  .adr-block-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--text3);margin-bottom:8px;margin-top:16px;}
+  .adr-block-label:first-child{margin-top:0;}
+  .adr-block-body{font-size:13px;color:var(--text2);line-height:1.9;}
+  .adr-block-body strong{color:var(--text);font-weight:400;}
+  .adr-inner-divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+  .consequence-row{display:flex;gap:10px;font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:4px;}
+  .consequence-plus{color:var(--good);font-family:'DM Mono',monospace;min-width:14px;}
+  .consequence-minus{color:var(--bad);font-family:'DM Mono',monospace;min-width:14px;}
+  .footer{text-align:center;padding:40px 24px 0;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);}
 </style>
 </head>
 <body>
 
 <div class="hero">
-  <div class="hero-label">// GUT-RAG DESIGN JOURNAL</div>
-  <div class="hero-title">腸で考えるRAG<br>設計と思想の記録</div>
+  <div class="hero-label">// GUT-RAG ARCHITECTURE DECISION RECORDS</div>
+  <div class="hero-title">腸で考えるRAG<br>設計判断の記録</div>
   <div class="hero-sub">
-    壁打ちセッションで生まれた洞察・設計決定・実装状況の記録。<br>
-    生きたアプリの証として、ここに残す。
+    「なぜそう設計したか」を、できるかぎり正直に書き留めています。<br>
+    問いに駆動された5つのアーキテクチャ判断と、その背景にある思考の経緯。
   </div>
   <div class="筋">
     <span class="筋-item h-hannya">般若心経・五蘊</span>
@@ -101,208 +109,257 @@
 
 <main>
 
+  <!-- GOAL -->
   <section>
-    <div class="sec-label">// 01 — なぜベクトル化しないか</div>
-    <h2>構造的継承（lineage retrieval）を選んだ理由</h2>
+    <div class="sec-label">// GOAL — このアプリが向かう先</div>
+    <h2>腸の感知を、身体知の思想地図の中に位置づける</h2>
+    <div class="goal-box">
+      <div class="goal-text">
+        「腸で感じた直感」は、言語化される前の状態で存在している。<br>
+        それを言語化し、般若心経・哲学・神経科学・身体知という思想の系譜の<em>どこに位置するかを知ること</em>が、このアプリの向かう先といえる。
+      </div>
+    </div>
+    <div class="axis-grid">
+      <div class="axis-card">
+        <div class="axis-label">// 軸A — 深さ（1回のループ）</div>
+        <div class="axis-body">
+          腸の感知<br>
+          → gut-logger で記録<br>
+          → gut-socratic で問い化<br>
+          → <strong>言語化の芽が生まれる</strong>
+        </div>
+      </div>
+      <div class="axis-card">
+        <div class="axis-label">// 軸B — 広さ（蓄積のループ）</div>
+        <div class="axis-body">
+          軸Aを繰り返す<br>
+          → meaning タグのパターンが浮かぶ<br>
+          → ナッジが次の感知を方向付ける<br>
+          → <strong>「自分の傾向」が見えてくる</strong>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">③ 地図への接続（未実装）</div>
+      <div class="card-body">
+        軸A・軸Bの蓄積 × 身体知マップ（gut-brain-map）の統合により、<br>
+        「自分の腸はこの思想空間のここにいる」という理解が生まれる。<br><br>
+        この接続は現時点では設計中にある。GoalとしてADRの判断を読むための文脈として、ここに記しておく。
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ADR-001 -->
+  <section>
+    <div class="adr-header">
+      <span class="adr-num">ADR-001</span>
+      <span class="status-badge status-adopted">採択済み</span>
+    </div>
+    <h2>なぜベクトル検索を使わないか</h2>
     <div class="insight">
       <div class="insight-text">
-        <em>「腸で感じた直感を、記録し、問いを通じて言語化する」</em><br>
-        個人知の蓄積。継承されるのは知識文書という思想の枠組みのみ。
+        <em>身体知は、言語化される以前の状態で存在している。</em><br>
+        ベクトル検索は「すでに言語化されたもの」同士を比べる道具といえる。言語化以前の感覚にそれを当てることは、構造的に一致しない。
+      </div>
+    </div>
+    <div class="adr-card">
+      <div class="adr-block-label">// CONTEXT — 背景</div>
+      <div class="adr-block-body">
+        五蘊の「受」（感受）は「想」（表象）より先に来る。メルロ＝ポンティの身体論では、世界との接触は意味が生まれる前の出来事として記述される。島皮質が「これだ」と感じる瞬間は、言語の手前にある。<br><br>
+        ベクトル検索は、すでに言語化された意味の空間を泳ぐことに最適化された道具といえる。言語化以前の感覚に対して意味的に近い文書を当てることは、構造的に一致しない。
+      </div>
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// DECISION — 決定</div>
+      <div class="adr-block-body">
+        <strong>lineage retrieval（系譜的取得）</strong>を採用している。<br><br>
+        これは、現代のAI開発でいう「ガードレール設計」に相当する考え方といえる。身体知マップ・完全構造図があらかじめガードレールとして機能し、感覚ラベル・meaningタグがどの知識文書に対応するかをその上に定義している。<br><br>
+        LLMはこのガードレールの外に出ない。意味の空間を自由に泳ぐのではなく、ガードレール上を辿って文書を取得する。ベクトル検索が起きないのは制約ではなく、この設計の帰結といえる。<br><br>
+        マッピングを手で書くということは、実践者の判断そのものを設計の中心に置くということ。その判断の集積が、このシステムの知性を形成している。
+      </div>
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// CONSEQUENCES — 帰結</div>
+      <div class="adr-block-body">
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>思想の筋（般若心経→哲学→神経科学→身体知）が応答に流れ続ける</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>「なぜこの文書が使われたか」が完全に透明で追跡可能</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>バックエンド不要。GitHub Pages完結が可能</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>過去の類似記録との意味的照合はできない</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>新しい感覚ラベルやmeaningタグの追加には手動マッピングが必要</span></div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">身体知が先行する、という事実</div>
+      <div class="card-title">lineage retrieval とは何か</div>
       <div class="card-body">
-        五蘊の「受」（感受）は「想」（表象）より先に来る。<br>
-        メルロ＝ポンティの「身体と世界の接触」は、意味が生まれる前の出来事。<br>
-        島皮質が「これだ」と感じる瞬間は、言語の手前にある。<br><br>
-        <strong>ベクトル検索は、言語化された意味の空間を泳ぐ道具。身体知は、その手前にある。</strong>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">「似ているものを探す」ではなく「この筋から来た言葉を渡す」</div>
-      <div class="card-body">
-        般若心経→哲学→神経科学→身体知、という線は、類似度ではなく<strong>継承の順序</strong>。<br>
-        ベクトル検索を使うとこの筋が切れる可能性がある。<br>
-        ベクトル化への問い：<strong>ベクトルが「ざわっと」に最も近いと判定したものが、哲学でも般若心経でもなかったとき、何を失うか。</strong>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">もしベクトル化したら</div>
-      <div class="card-body">
-        ＋ 「会議中のざわっと」と過去の似た記録が意味的に照合される<br>
-        ＋ 予期しない接続が生まれる<br>
-        − 思想の筋が切れる可能性がある<br>
-        − 「なぜこれが返ってきたか」が不透明になる<br>
-        − バックエンドが必要になる<br><br>
-        <strong>次の地平：</strong>完全構造図のrequires/enablesをそのまま辿る「グラフ探索型RAG」が、思想の筋を最も忠実に継承できる可能性がある。
+        <strong>定義：</strong>思想の継承の連鎖（lineage）に沿って文書を取得するRAGの手法。クエリとの類似度ではなく、設計者が定めた知的系譜の構造に基づいて文書を選択・注入する。<br><br>
+        <strong>既存手法との対比：</strong><br>
+        · vector similarity search：クエリとの意味的近さで取得<br>
+        · keyword retrieval：キーワード一致で取得<br>
+        · <strong>lineage retrieval</strong>：知的継承の連鎖の各層を代表する文書を取得<br><br>
+        <strong>このプロジェクトでの実装：</strong><br>
+        hannya-001（般若心経）→ tetsugaku-001（哲学）→ nou-007（神経科学）→ kotoba-011（身体知）の4層から必ず1件ずつ取得し、Socraticのプロンプトに注入する。
       </div>
     </div>
   </section>
 
   <hr class="divider">
 
+  <!-- ADR-002 -->
   <section>
-    <div class="sec-label">// 02 — 2つの流れの関係性</div>
-    <h2>経験文書と知識文書はどこで出会うか</h2>
+    <div class="adr-header">
+      <span class="adr-num">ADR-002</span>
+      <span class="status-badge status-adopted">採択済み</span>
+    </div>
+    <h2>なぜLLMを「問う役」にしたか</h2>
     <div class="insight">
       <div class="insight-text">
-        <em>「並列注入であり、合流はLLMに委ねている」</em>が基本構造。<br>
-        C案（v4）で、meaningタグを介した<em>検索レベルの接続</em>が加わった。
+        <em>正解を与えることは、発見を奪う。</em><br>
+        身体知の言語化において、気づきは外部から与えられるのではなく、問いによって内部から引き出される。
       </div>
     </div>
-    <div class="card">
-      <div class="card-title">経験文書（gut-logger）</div>
-      <div class="card-body">
-        集計値のみを注入：当たり率・よく感じる文脈・meaningタグの傾向<br>
-        自由入力テキスト（note）は一切送信しない<br>
-        → LLMは「この人のパターン」を知る
+    <div class="adr-card">
+      <div class="adr-block-label">// CONTEXT — 背景</div>
+      <div class="adr-block-body">
+        「腸で感じたこと」に対してLLMが「それはこういうことです」と正解を返す設計を最初に検討した。しかしこの設計は、目的と矛盾する。<br><br>
+        身体知の言語化において重要なのは、記録者自身が「腑に落ちる」瞬間を経験することといえる。外部から与えられた言語は借り物であり、腸の回路を開かない。コーチングの原則「教えない・問う」は、ここでも成立すると考えている。
       </div>
-    </div>
-    <div class="card">
-      <div class="card-title">知識文書（knowledge.js）— lineage retrieval</div>
-      <div class="card-body">
-        31件の文書から思想の筋の4層（般若心経・哲学・神経科学・身体知）の代表を必ず確保し注入<br>
-        → LLMは「このプロジェクトの文脈と語彙」を知る
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// DECISION — 決定</div>
+      <div class="adr-block-body">
+        LLMのロールを<strong>「答える者」から「問う者」</strong>に転換している。<br><br>
+        Socraticプロンプトは、記録の内容に対して問いを返すよう設計する。応答の最後に必ず「問い」が含まれ、記録者が次の腸の感知へと向かうことを促す。<br><br>
+        評価基準も転換する。「正確さ」ではなく「共鳴するか」が成功指標になる。
       </div>
-    </div>
-    <div class="card">
-      <div class="card-title">C案：meaningタグ → 知識文書の橋（v4 実装済み）</div>
-      <div class="card-body">
-        「場の空気を感じていた」→ kotoba-003（気配を読む）/ kotoba-008（間）<br>
-        「思い込みだった」→ tetsugaku-003（グッドハートの法則）/ nou-005（PFC）<br>
-        13タグ定義済み。lineageとの重複は除外して注入。<br><br>
-        <strong>注入順序（確定）：</strong><br>
-        lineage（普遍・固定）→ meaningContext（経験由来・変動）→ expContext（統計・変動）<br>
-        LLMに渡る文脈が「普遍→個人固有」の順に流れる。この順序が応答の深さに直結する。
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// CONSEQUENCES — 帰結</div>
+      <div class="adr-block-body">
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>記録者自身の内省が深まる。腸の回路が開く</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>「正解」がないため、hallucination benchmarkが無関係になる</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>「共鳴するか」という感覚的評価が、唯一の成功指標として成立する</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>「答えを求めている人」には物足りない体験になりうる</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>問いの質がプロンプト設計の精度に強く依存する</span></div>
       </div>
     </div>
   </section>
 
   <hr class="divider">
 
+  <!-- ADR-003 -->
   <section>
-    <div class="sec-label">// 03 — 実装状況（v4時点・正直な評価）</div>
-    <h2>今の実装で何が動いていて、何が足りないか</h2>
-    <table class="status-table">
-      <tr>
-        <th>機能</th><th>状態</th><th>説明</th>
-      </tr>
-      <tr>
-        <td>経験文書RAG</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>gut-logger集計値をプロンプト注入</td>
-      </tr>
-      <tr>
-        <td>知識文書RAG（lineage）</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>思想の筋4層から必ず1件確保</td>
-      </tr>
-      <tr>
-        <td>思想の筋のプロンプト明示</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>LLMに「この筋で応答せよ」という指示を追加</td>
-      </tr>
-      <tr>
-        <td>meaningタグ↔知識文書の連携（C案）</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>MEANING_KNOWLEDGE_MAP 13タグ定義、lineage重複除外</td>
-      </tr>
-      <tr>
-        <td>「次の問い」の持ち越し（D案v2）</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>gut_next_q → gut-loggerナッジバナー（48h有効）</td>
-      </tr>
-      <tr>
-        <td>体験モード（デモ応答24件）</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>APIキー不要で「もっと深く探る」を体験</td>
-      </tr>
-      <tr>
-        <td>ことばの種 UI</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>plain_insight + resonance_question をSocratic応答後に表示</td>
-      </tr>
-      <tr>
-        <td>記録エクスポート</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>JSONでローカルダウンロード、localStorage喪失リスク対策</td>
-      </tr>
-      <tr>
-        <td>plain_insight（全31件）</td>
-        <td><span class="badge partial">△ 4件のみ</span></td>
-        <td>lineage 4件は完了。残27件は未追加</td>
-      </tr>
-      <tr>
-        <td>design-log.html 更新</td>
-        <td><span class="badge done">✅ 実装済み</span></td>
-        <td>このページ</td>
-      </tr>
-      <tr>
-        <td>Zenn記事</td>
-        <td><span class="badge notyet">保留</span></td>
-        <td>全実装完了後</td>
-      </tr>
-    </table>
-  </section>
-
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 04 — 実装プランの履歴</div>
-    <h2>やったこと・その順序</h2>
-    <div class="plan-row">
-      <div class="plan-num done-num">A</div>
-      <div class="plan-content">
-        <div class="plan-title">buildKnowledgeContext 再設計 ✅</div>
-        <div class="plan-desc">思想の筋の各層から必ず1件確保する。hannya-001 / tetsugaku-001 / nou-007 / kotoba-011 を常に注入。</div>
-      </div>
+    <div class="adr-header">
+      <span class="adr-num">ADR-003</span>
+      <span class="status-badge status-adopted">採択済み</span>
     </div>
-    <div class="plan-row">
-      <div class="plan-num done-num">B</div>
-      <div class="plan-content">
-        <div class="plan-title">Socraticプロンプトに筋の明示を追加 ✅</div>
-        <div class="plan-desc">「以下の思想の筋が応答に自然に流れるよう：般若心経・五蘊 → 哲学 → 神経科学 → 身体知」をプロンプトに明記。</div>
-      </div>
-    </div>
-    <div class="plan-row">
-      <div class="plan-num done-num">C</div>
-      <div class="plan-content">
-        <div class="plan-title">meaningタグ → 知識文書対応表 ✅</div>
-        <div class="plan-desc">13タグ定義済み。lineage固定4件との重複を除外する設計が重要。経験と知識が検索レベルで繋がった。</div>
-      </div>
-    </div>
-    <div class="plan-row">
-      <div class="plan-num done-num">D</div>
-      <div class="plan-content">
-        <div class="plan-title">「この問いを持ち歩く」機能（D案v2） ✅</div>
-        <div class="plan-desc">「次の問い」と問いの向き（根/境/識）をgut-loggerに保存。48時間有効なナッジバナーとして表示。螺旋構造の完成。</div>
-      </div>
-    </div>
-    <div class="plan-row">
-      <div class="plan-num done-num">E</div>
-      <div class="plan-content">
-        <div class="plan-title">記録エクスポート機能 ✅</div>
-        <div class="plan-desc">gut-loggerのパターンタブからJSON書き出し。profile + logs + exportedAt をまとめてダウンロード。</div>
-      </div>
-    </div>
-    <div class="plan-row">
-      <div class="plan-num done-num">F</div>
-      <div class="plan-content">
-        <div class="plan-title">体験モード + ことばの種 UI ✅</div>
-        <div class="plan-desc">APIキーなしで24件のデモ応答を体験。Socratic応答後に plain_insight + resonance_question を折りたたみ表示。</div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 05 — 螺旋構造の完成（v4）</div>
-    <h2>腸→脳→腸、というループが動き始めた</h2>
+    <h2>なぜlocalStorage端末完結にしたか</h2>
     <div class="insight">
       <div class="insight-text">
-        <em>色即是空・空即是色</em>と同型。記録が問いを呼び、問いが新たな記録を生む。
+        <em>個人の腸の記録は、個人のものといえる。</em><br>
+        集合知として継承するのではなく、個人のパターンにこそ価値がある。
+      </div>
+    </div>
+    <div class="adr-card">
+      <div class="adr-block-label">// CONTEXT — 背景</div>
+      <div class="adr-block-body">
+        身体感覚の記録はプライベートな内的体験といえる。サーバーに送信・保存するアーキテクチャは技術的に可能だが、このプロジェクトの哲学的立場と合わない。<br><br>
+        「集合知として継承する」という言葉が一度検討されたが、正確ではなかった。データは個人のデバイスを離れない。個人の腸の記録に意味があるのは、それが「その人のパターン」であるためで、平均化・集合化した時点で失われるものがある。
+      </div>
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// DECISION — 決定</div>
+      <div class="adr-block-body">
+        全記録データを<strong>localStorageに保存する。バックエンドを持たない。</strong><br><br>
+        外部通信先はapi.anthropic.com（LLM推論）のみ。自由入力テキスト（note）はAPIに送信しない。APIには感覚ラベル・meaningタグ・統計値のみを送る。<br><br>
+        プライバシーの最も正直な保証は「コードを見れば確認できる」ことといえる。MITライセンスで公開されているコードが、プライバシーポリシー宣言の代わりになる。
+      </div>
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// CONSEQUENCES — 帰結</div>
+      <div class="adr-block-body">
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>プライバシーが構造的に保証される（コードで検証可能）</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>バックエンド不要。GitHub Pages完結が可能</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>「個人のパターン」という本来の価値に集中できる</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>デバイスを変えると記録が消える（JSONエクスポートで対応）</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>複数デバイス間の同期はできない</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ADR-004 -->
+  <section>
+    <div class="adr-header">
+      <span class="adr-num">ADR-004</span>
+      <span class="status-badge status-adopted">採択済み</span>
+    </div>
+    <h2>gut-ragの実態——写像と変換</h2>
+    <div class="insight">
+      <div class="insight-text">
+        <em>検索は起きていない。</em><br>
+        ガードレール上を辿る写像と、LLMによる自然言語への変換が起きている。
+      </div>
+    </div>
+    <div class="adr-card">
+      <div class="adr-block-label">// CONTEXT — 背景</div>
+      <div class="adr-block-body">
+        プロジェクト名に「RAG」を含む。しかしRAGという言葉は一般に、ベクトル検索による文書取得を連想させる。gut-ragで実際に起きていることを正確に記述する必要があった。<br><br>
+        曖昧なまま「RAGです」と言い続けることは、設計の誠実さに反すると考えている。
+      </div>
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// DECISION — 決定</div>
+      <div class="adr-block-body">
+        gut-ragの動作を<strong>2段階の変換</strong>として記述する：<br><br>
+        <strong>① 写像（決定論的）</strong><br>
+        EMOJI_KNOWLEDGE_MAP / MEANING_KNOWLEDGE_MAP による写像。感覚ラベル・meaningタグ → 知識文書ID。これはADR-001で述べたガードレール上を辿ることに相当し、確率的要素はない。<br><br>
+        <strong>② 変換（自然言語化）</strong><br>
+        取得した知識文書と経験統計をコンテキストとして、LLMが自然言語の問いに変換する。LLMはここから関与する。<br><br>
+        LLMの役割は「設計された地図を読み上げる案内人」に近い。ガードレールの外に出て情報を自由に探す主体とは異なる。
+      </div>
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// CONSEQUENCES — 帰結</div>
+      <div class="adr-block-body">
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>動作が完全に透明・予測可能。「なぜこの応答か」を設計レベルで追跡できる</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>ハルシネーションのリスクが限定的（事実を述べるのではなく問いを返すため）</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>「RAG」という名称の内実を正直に語れるようになった</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>「RAG」という名称に技術的な厳密さがない（設計者の意図的な妥協）</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>写像テーブルの拡張は手動作業が必要</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ADR-005 -->
+  <section>
+    <div class="adr-header">
+      <span class="adr-num">ADR-005</span>
+      <span class="status-badge status-adopted">採択済み</span>
+    </div>
+    <h2>なぜgut-loggerとgut-socraticが別アプリなのか</h2>
+    <div class="insight">
+      <div class="insight-text">
+        <em>記録する行為と、問いを受ける行為は、異なる身体状態を必要とする。</em><br>
+        同一画面に置くことは、両者の質を下げると考えた。
+      </div>
+    </div>
+    <div class="adr-card">
+      <div class="adr-block-label">// CONTEXT — 背景</div>
+      <div class="adr-block-body">
+        初期設計では、記録とSocratic対話を単一画面に置くことも検討した。しかし実装を進める中で、「記録する」という行為と「問いを受け、内省する」という行為が、異なる注意の向き・身体状態を要求することが見えてきた。<br><br>
+        記録は「今ここ」の感知を素早く捉える行為。Socratic対話は「少し距離を置いて問いに向き合う」行為。これらを同じ画面に置くことは、どちらの質も下げると判断した。
+      </div>
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// DECISION — 決定</div>
+      <div class="adr-block-body">
+        gut-loggerとgut-socraticを<strong>別HTMLファイルとして分離する。</strong><br><br>
+        記録はgut-loggerで完結し、gut-socraticへの遷移は任意とする。2つの画面の往復が、腸→脳→腸という螺旋を物理的に体現する形になる。
+      </div>
+      <hr class="adr-inner-divider">
+      <div class="adr-block-label">// CONSEQUENCES — 帰結</div>
+      <div class="adr-block-body">
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>記録時と内省時の「場」が分かれ、それぞれの質が上がる</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>螺旋の往復（記録 → 問い → 新たな記録）が画面遷移として可視化される</span></div>
+        <div class="consequence-row"><span class="consequence-plus">+</span><span>片方だけを使うことも自然にできる</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>遷移にひと手間かかる</span></div>
+        <div class="consequence-row"><span class="consequence-minus">−</span><span>2アプリ間の状態（gut_next_q）の受け渡しに設計コストがかかる</span></div>
       </div>
     </div>
     <div class="spiral">
@@ -340,144 +397,35 @@
         <span class="spiral-label">48h 有効・✕で手動消去</span>
       </div>
     </div>
-    <div class="card">
-      <div class="card-title">十八界（根/境/識）との対応</div>
-      <div class="card-body">
-        根（感覚器・身体）↔ gut-loggerの感覚ラベル<br>
-        境（対象・何が）↔ gut-loggerの文脈ラベル<br>
-        識（認識・意味づけ）↔ gut-loggerのmeaningタグ<br><br>
-        Socraticが返す「問いの向き」（根/境/識）は、この分類に基づく。<br>
-        次の記録でどの軸に注目すべきかをユーザーに伝える。
-      </div>
-    </div>
   </section>
 
   <hr class="divider">
 
+  <!-- 付録 -->
   <section>
-    <div class="sec-label">// 06 — 体験モードの設計哲学</div>
-    <h2>摩擦を体験の前に置かない</h2>
-    <div class="insight">
-      <div class="insight-text">
-        <em>「APIキーを設定しないと動かない」は、まだ体験していない人に向けたハードルだ。</em><br>
-        体験してから設定する、の順が正しい。
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">設計の判断</div>
-      <div class="card-body">
-        APIキー未設定の状態で「もっと深く探る」を押した瞬間、デモ応答が流れる。<br>
-        「✦ 体験モード」バッジと、APIキー設定への自然な導線を同時に表示。<br><br>
-        <strong>24件のプリセット：</strong> 4カテゴリ × 6チョイス。<br>
-        プリセットは「典型的な気づき」であり、パーソナライズ応答との差分がAPIキー設定への動機になる。
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">ことばの種（plain_insight + resonance_question）</div>
-      <div class="card-body">
-        Socratic応答後に折りたたみセクションとして出現。タップで開くと：<br>
-        ・plain_insight：宗教・学術フレームを外した体感の言葉（1〜3文）<br>
-        ・resonance_question：知識から記録へ向かう問い（gut-loggerへの橋）<br><br>
-        <strong>設計原則：</strong>「ことばの種」は解説ではなく、「開く扉」。<br>
-        「この言葉、なんだろう」と思わせれば成功。説明しきらないことが価値。<br><br>
-        現状：lineage 4件のみ plain_insight を追加済み。残27件は未追加。
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 07 — sw.js の教訓</div>
-    <h2>サービスワーカーが外部オリジンを横取りしていた</h2>
+    <div class="sec-label">// APPENDIX — 実装ノート</div>
+    <h2>sw.js：外部オリジンの横取り問題</h2>
     <div class="warn-box">
       <div class="warn-title">// BUG: TypeError: body is already used</div>
-      <div class="warn-body">旧 sw.js は外部オリジン（api.anthropic.com）の fetch も横取りしていた。<br>
-      レスポンスを r.clone() + return r で二重消費 → API 呼び出しが無音で失敗。</div>
+      <div class="warn-body">
+        旧 sw.js は外部オリジン（api.anthropic.com）の fetch も横取りしていた。<br>
+        レスポンスを r.clone() + return r で二重消費 → API 呼び出しが無音で失敗。
+      </div>
     </div>
     <div class="card">
       <div class="card-title">修正（v6）</div>
       <div class="card-body">
         <div class="code">// 外部オリジンは即座にバイパス<br>if (url.origin !== self.location.origin) return;</div>
-        この1行をfetchイベントの先頭に入れる。<br>
-        GitHub Pages + Anthropic API の構成では必須。<br><br>
-        <strong>教訓：</strong>PWAのサービスワーカーは、外部API通信と共存する場合にオリジンチェックが不可欠。<br>
-        外部オリジンをバイパスしないと、APIレスポンスのbodyが消費済みになりエラーになる。
+        この1行をfetchイベントの先頭に入れる。GitHub Pages + Anthropic API の構成では必須になる。<br><br>
+        <strong>教訓：</strong>PWAのサービスワーカーは、外部API通信と共存する場合にオリジンチェックが不可欠。外部オリジンをバイパスしないと、APIレスポンスのbodyが消費済みになりエラーになる。
       </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 08 — セッションで生まれた問い</div>
-    <h2>まだ答えが出ていないこと</h2>
-    <div class="card">
-      <div class="card-body">
-        plain_insight 残27件をどのタイミングで追加するか<br>
-        → ことばの種UIはlineage 4件でも機能する。残りは優先度低<br><br>
-        ことばの種の「体験」はどう評価するか<br>
-        → 「腑に落ちるか」という感覚的評価が唯一の基準。数値化できない<br><br>
-        螺旋がどこで途切れるか<br>
-        → ナッジを無視したとき。設計は「無視しても失わない」を原則とすべき<br><br>
-        Zenn記事の入口をどこに置くか<br>
-        → 「なんか違う、を無視してきた」という共感点から始める
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 09 — 造語・新概念</div>
-    <h2>このプロジェクトで生まれた言葉</h2>
-    <div class="card">
-      <div class="card-title">lineage retrieval（リネージ・リトリーバル）</div>
-      <div class="card-body">
-        <strong>定義：</strong>思想の継承の連鎖（lineage）に沿って文書を取得するRAGの手法。クエリとの類似度ではなく、設計者が定めた知的系譜の構造に基づいて文書を選択・注入する。<br><br>
-        <strong>既存手法との違い：</strong><br>
-        ・vector similarity search：クエリとの意味的近さで取得<br>
-        ・keyword retrieval：キーワード一致で取得<br>
-        ・lineage retrieval：知的継承の連鎖の各層を代表する文書を取得<br><br>
-        <strong>このプロジェクトでの実装：</strong><br>
-        般若心経（hannya-001）→ 哲学（tetsugaku-001）→ 神経科学（nou-007）→ 身体知（kotoba-011）の4層から必ず1件ずつ取得し、Socraticのプロンプトに注入する。<br><br>
-        <strong>なぜこの名前か：</strong><br>
-        身体知は言語化の「前」に存在するため、意味の空間（ベクトル空間）での類似検索とは構造的に不一致。思想の筋は類似度ではなく継承の順序であり、その継承（lineage）に沿って取得することが設計思想と一致する。
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 10 — Zenn記事の訴求点</div>
-    <h2>この経験から伝えたいこと</h2>
-    <div class="zenn-item">
-      <div class="zenn-num">①</div>
-      <div class="zenn-body"><strong>「なんか違う」を無視してきた</strong><br>入口は共感。品質エンジニアとして、あるいは人間として、言語化できない違和感を脇に置いてきた経験。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">②</div>
-      <div class="zenn-body"><strong>なぜベクトル化しなかったか</strong><br>身体知は言語化の前にある。だからベクトル空間（意味の空間）での類似検索は、構造的に一致しない。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">③</div>
-      <div class="zenn-body"><strong>このツールが解くのは何か（再定義）</strong><br>個人の直感を言語化して理解に繋げること。集合知ではなく個人知。過剰な主張を外し、今できることに誠実に。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">④</div>
-      <div class="zenn-body"><strong>もしベクトル化したら何が得られ、何が失われるか</strong><br>読者の探求心を刺激する。「自分だったらどう設計するか」を考えさせる。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">⑤</div>
-      <div class="zenn-body"><strong>制約が思想を生んだ</strong><br>「バックエンドなし・vanilla JS・GitHub Pages完結」という制約が、「なぜベクトル化しないか」という問いを産んだ。やってみた価値は、こうやって紡がれる。</div>
     </div>
   </section>
 
 </main>
 
 <div class="footer">
-  gut-rag design journal — v4 updated<br>
+  gut-rag architecture decision records<br>
   腸で感じた直感を、記録し、問いを通じて言語化する
 </div>
 
