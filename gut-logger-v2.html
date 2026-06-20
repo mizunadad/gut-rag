@@ -157,6 +157,25 @@
     cursor: pointer; transition: all 0.2s; margin-top: 8px;
   }
 .export-btn:hover { border-color: var(--signal); color: var(--signal); }
+
+  /* resonance chip on log card */
+  .resonance-row {
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+  }
+  .resonance-label {
+    font-size: 9px; font-family: 'DM Mono', monospace;
+    color: var(--text3); letter-spacing: 0.1em; flex-shrink: 0;
+  }
+  .resonance-chip {
+    font-size: 10px; padding: 3px 9px; border-radius: 10px;
+    border: 1px solid rgba(96,165,250,0.3);
+    color: rgba(96,165,250,0.7);
+    background: rgba(96,165,250,0.06);
+    font-family: 'DM Mono', monospace;
+  }
+
   /* PATTERN TAB */
   .pattern-section { margin-bottom: 28px; }
   .pat-title {
@@ -407,25 +426,6 @@
   .meaning-note-display {
     width: 100%; font-size: 11px; color: var(--text2);
     font-style: italic; line-height: 1.6; margin-top: 2px;
-  }
-
-  /* ── 共鳴チップ（gut-socratic 接続） ── */
-  .resonance-row {
-    margin-top: 6px; padding-top: 6px;
-    border-top: 1px solid var(--border);
-    display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
-  }
-  .resonance-chip {
-    font-size: 10px; padding: 3px 10px; border-radius: 10px;
-    border: 1px solid rgba(167,139,250,0.3);
-    color: rgba(167,139,250,0.85);
-    font-family: 'DM Mono', monospace;
-    background: rgba(167,139,250,0.06);
-    letter-spacing: 0.02em;
-  }
-  .resonance-label {
-    font-size: 10px; color: var(--text3);
-    font-family: 'DM Mono', monospace;
   }
 
   /* ── Socratic ナッジ（前回の問い）バナー ── */
@@ -956,7 +956,7 @@ function renderLogs() {
       ${log.resonance ? `
         <div class="resonance-row">
           <span class="resonance-label">共鳴</span>
-          <span class="resonance-chip">${log.resonance.title}${log.resonance.layer ? ` [${log.resonance.layer}]` : ''}</span>
+          <span class="resonance-chip">${log.resonance.title}</span>
         </div>` : ''}`;
     list.appendChild(card);
   });
