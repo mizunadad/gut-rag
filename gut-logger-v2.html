@@ -409,6 +409,25 @@
     font-style: italic; line-height: 1.6; margin-top: 2px;
   }
 
+  /* ── 共鳴チップ（gut-socratic 接続） ── */
+  .resonance-row {
+    margin-top: 6px; padding-top: 6px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+  }
+  .resonance-chip {
+    font-size: 10px; padding: 3px 10px; border-radius: 10px;
+    border: 1px solid rgba(167,139,250,0.3);
+    color: rgba(167,139,250,0.85);
+    font-family: 'DM Mono', monospace;
+    background: rgba(167,139,250,0.06);
+    letter-spacing: 0.02em;
+  }
+  .resonance-label {
+    font-size: 10px; color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
   /* ── Socratic ナッジ（前回の問い）バナー ── */
   .socratic-nudge {
     display: none;
@@ -933,6 +952,11 @@ function renderLogs() {
         <div class="meaning-row">
           ${log.meaning.tags.map(t => `<span class="meaning-chip-display">${t}</span>`).join('')}
           ${log.meaning.note ? `<span class="meaning-note-display">"${log.meaning.note}"</span>` : ''}
+        </div>` : ''}
+      ${log.resonance ? `
+        <div class="resonance-row">
+          <span class="resonance-label">共鳴</span>
+          <span class="resonance-chip">${log.resonance.title}${log.resonance.layer ? ` [${log.resonance.layer}]` : ''}</span>
         </div>` : ''}`;
     list.appendChild(card);
   });
@@ -1117,6 +1141,6 @@ function exportLogs() {
 renderLogs();
 loadSocraticNudge();
 </script>
-<div class="ver-badge">gut-logger v4.3</div>
+<div class="ver-badge">gut-logger v4.2</div>
 </body>
 </html>
