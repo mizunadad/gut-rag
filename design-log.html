@@ -54,10 +54,6 @@
   .insight{border-left:2px solid var(--signal);padding:14px 18px;background:rgba(245,158,11,.04);border-radius:0 8px 8px 0;margin-bottom:16px;}
   .insight-text{font-size:13px;color:var(--text2);line-height:1.9;}
   .insight-text em{color:var(--text);font-style:normal;}
-  .zenn-item{display:flex;gap:14px;margin-bottom:14px;}
-  .zenn-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--signal);min-width:24px;padding-top:2px;}
-  .zenn-body{font-size:12px;color:var(--text2);line-height:1.8;}
-  .zenn-body strong{color:var(--text);font-weight:400;}
   .footer{text-align:center;padding:40px 24px 0;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);}
   /* 螺旋図 */
   .spiral{display:flex;flex-direction:column;gap:0;margin:20px 0;}
@@ -238,11 +234,6 @@
         <td><span class="badge done">✅ 実装済み</span></td>
         <td>このページ</td>
       </tr>
-      <tr>
-        <td>Zenn記事</td>
-        <td><span class="badge notyet">保留</span></td>
-        <td>全実装完了後</td>
-      </tr>
     </table>
   </section>
 
@@ -419,9 +410,7 @@
         ことばの種の「体験」はどう評価するか<br>
         → 「腑に落ちるか」という感覚的評価が唯一の基準。数値化できない<br><br>
         螺旋がどこで途切れるか<br>
-        → ナッジを無視したとき。設計は「無視しても失わない」を原則とすべき<br><br>
-        Zenn記事の入口をどこに置くか<br>
-        → 「なんか違う、を無視してきた」という共感点から始める
+        → ナッジを無視したとき。設計は「無視しても失わない」を原則とすべき
       </div>
     </div>
   </section>
@@ -447,101 +436,7 @@
     </div>
   </section>
 
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 10 — Zenn記事の訴求点</div>
-    <h2>この経験から伝えたいこと</h2>
-    <div class="zenn-item">
-      <div class="zenn-num">①</div>
-      <div class="zenn-body"><strong>「なんか違う」を無視してきた</strong><br>入口は共感。品質エンジニアとして、あるいは人間として、言語化できない違和感を脇に置いてきた経験。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">②</div>
-      <div class="zenn-body"><strong>なぜベクトル化しなかったか</strong><br>身体知は言語化の前にある。だからベクトル空間（意味の空間）での類似検索は、構造的に一致しない。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">③</div>
-      <div class="zenn-body"><strong>このツールが解くのは何か（再定義）</strong><br>個人の直感を言語化して理解に繋げること。集合知ではなく個人知。過剰な主張を外し、今できることに誠実に。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">④</div>
-      <div class="zenn-body"><strong>もしベクトル化したら何が得られ、何が失われるか</strong><br>読者の探求心を刺激する。「自分だったらどう設計するか」を考えさせる。</div>
-    </div>
-    <div class="zenn-item">
-      <div class="zenn-num">⑤</div>
-      <div class="zenn-body"><strong>制約が思想を生んだ</strong><br>「バックエンドなし・vanilla JS・GitHub Pages完結」という制約が、「なぜベクトル化しないか」という問いを産んだ。やってみた価値は、こうやって紡がれる。</div>
-    </div>
-  </section>
-
 </main>
-
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 11 — ADR-006：lineage retrieval の実証</div>
-    <h2>ログは感情日記ではなく、決定木の通過記録である</h2>
-    <div class="insight">
-      <div class="insight-text">
-        <em>「感じられないものは選ばれない」</em>——lineage retrieval の設計原則が実証された。
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Dead Node 分析（全31件中）</div>
-      <div class="card-body">
-        lineage retrieval は決定論的探索。EMOJI_MAP と MEANING_MAP で到達できるノードは確定的に決まる。<br><br>
-        Dead Node はわずか2件：<br>
-        ・<strong>nou-007「3層構造・全体」</strong>— 概念の説明文書。身体で感じる対象ではない<br>
-        ・<strong>hannya-004「般若心経・概要」</strong>— 概要は到達不能。具体的概念はすべて到達可能<br><br>
-        残り29件はすべて、具体的な感覚・文脈・意味タグから到達できる。<br>
-        「感じられないものは選ばれない」という原則と完全に一致。
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">lineage retrieval = 決定論的探索</div>
-      <div class="card-body">
-        <div class="code">vector search     = 確率論的（類似度で揺れる）<br>
-lineage retrieval = 決定論的（EMOJI_MAPで確定）</div>
-        LLMはその文書の文脈の中だけで「解釈」する。「探索」しない。<br>
-        ガードレール設計：手描きの対応表（MAP）が、LLMの動ける空間を構造的に限定する。
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <section>
-    <div class="sec-label">// 12 — ADR-007：1ログ1共鳴・上書き</div>
-    <h2>gut-ragは過去の記録庫ではなく、身体知の「現在」を映す鏡である</h2>
-    <div class="insight">
-      <div class="insight-text">
-        <em>腸の信号は「今」しか語らない。上書きは劣化ではなく更新。</em>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">設計原則</div>
-      <div class="card-body">
-        1ログに対して共鳴は1件のみ。Socraticセッションを新たに行うと上書きされる。<br>
-        これは欠陥ではなく、意図的な設計。<br><br>
-        <strong>なぜ上書きか：</strong><br>
-        ・腸の信号は今この瞬間のものを語る<br>
-        ・蓄積される「共鳴の地図」は、最新の理解が反映された状態が正しい<br>
-        ・カード数（記録数）が鏡の解像度になる
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">logId による書き戻し先の特定（v4.4/v4.9）</div>
-      <div class="card-body">
-        gut-loggerの各ログカードから「Socraticで問いを深める」をタップすると、<br>
-        URLパラメータ <span class="code" style="display:inline;padding:2px 6px;font-size:10px">?logId=XXXXXXX</span> が付与される。<br><br>
-        gut-socraticはこのlogIdをURLから読み取り、<br>
-        対象のログに直接 resonance を書き戻す。<br><br>
-        <strong>localStorage スキーマ（resonance フィールド）：</strong>
-        <div class="code">{ docId, title, layer, mapId, ts }</div>
-        mapId が存在する場合、共鳴チップから gut-brain-map の該当ノードへ直接ジャンプ。
-      </div>
-    </div>
-  </section>
 
 <div class="footer">
   gut-rag design journal — v6 updated<br>

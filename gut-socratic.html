@@ -585,6 +585,48 @@
     color: rgba(245,158,11,0.7); background: rgba(245,158,11,0.06);
     display: inline-block; margin-bottom: 16px;
   }
+
+  /* ── demo compare card ── */
+  .demo-compare {
+    padding: 16px; border-radius: 12px;
+    border: 1px solid rgba(245,158,11,0.2);
+    background: rgba(245,158,11,0.04);
+    margin-top: 4px;
+  }
+  .demo-compare-hdr {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(245,158,11,0.6); margin-bottom: 14px;
+  }
+  .demo-compare-grid {
+    display: grid; grid-template-columns: 1fr 1px 1fr;
+    gap: 12px; margin-bottom: 16px;
+  }
+  .demo-compare-sep { background: var(--border); }
+  .demo-col-label {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .demo-col-now .demo-col-label { color: var(--text3); }
+  .demo-col-api .demo-col-label { color: rgba(245,158,11,0.65); }
+  .demo-col-items { display: flex; flex-direction: column; gap: 7px; }
+  .demo-col-item {
+    font-size: 11px; color: var(--text2);
+    line-height: 1.5; padding-left: 12px; position: relative;
+  }
+  .demo-col-now .demo-col-item::before { content: '—'; position:absolute; left:0; color: var(--text3); }
+  .demo-col-api .demo-col-item::before { content: '✓'; position:absolute; left:0; color: rgba(245,158,11,0.65); }
+  .demo-compare-cta {
+    width: 100%; padding: 12px; border-radius: 10px;
+    border: 1px solid rgba(245,158,11,0.3); background: transparent;
+    color: rgba(245,158,11,0.75); font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px; cursor: pointer; transition: all 0.25s;
+    letter-spacing: 0.04em;
+  }
+  .demo-compare-cta:hover {
+    background: rgba(245,158,11,0.07);
+    border-color: rgba(245,158,11,0.55); color: #f59e0b;
+  }
 </style>
 </head>
 <body>
@@ -599,6 +641,34 @@
     それを、少しだけ一緒に探ってみませんか。
   </p>
   <button class="btn-start" onclick="go(1)">はじめる</button>
+  <!-- demo compare card（APIキー未設定時のみ表示） -->
+  <div class="demo-compare" id="demoCompareS0" style="display:none;margin-top:28px;text-align:left;">
+    <div class="demo-compare-hdr">✦ モードについて</div>
+    <div class="demo-compare-grid">
+      <div class="demo-col demo-col-now">
+        <div class="demo-col-label">体験モード（今）</div>
+        <div class="demo-col-items">
+          <div class="demo-col-item">24通りの固定応答</div>
+          <div class="demo-col-item">誰でも同じ問い</div>
+          <div class="demo-col-item">ログと連動しない</div>
+          <div class="demo-col-item">共鳴は記録されない</div>
+        </div>
+      </div>
+      <div class="demo-compare-sep"></div>
+      <div class="demo-col demo-col-api">
+        <div class="demo-col-label">APIキーあり</div>
+        <div class="demo-col-items">
+          <div class="demo-col-item">あなたの記録から生成</div>
+          <div class="demo-col-item">絵文字×文脈で変わる</div>
+          <div class="demo-col-item">lineageで知識文書を選択</div>
+          <div class="demo-col-item">共鳴がlogに刻まれる</div>
+        </div>
+      </div>
+    </div>
+    <button class="demo-compare-cta" onclick="openApikeyModal(false)">
+      APIキーを設定して、自分の腸から始める →
+    </button>
+  </div>
 </div>
 
 <!-- SCREEN 1: Category -->
@@ -684,6 +754,34 @@
   <button class="btn-restart" onclick="restart()" id="restartBtn" style="display:none">
     最初からやり直す
   </button>
+  <!-- demo compare card（体験モード時のみ表示） -->
+  <div class="demo-compare" id="demoCompare" style="display:none">
+    <div class="demo-compare-hdr">✦ 体験モードの応答です</div>
+    <div class="demo-compare-grid">
+      <div class="demo-col demo-col-now">
+        <div class="demo-col-label">体験モード（今）</div>
+        <div class="demo-col-items">
+          <div class="demo-col-item">24通りの固定応答</div>
+          <div class="demo-col-item">誰でも同じ問い</div>
+          <div class="demo-col-item">ログと連動しない</div>
+          <div class="demo-col-item">共鳴は記録されない</div>
+        </div>
+      </div>
+      <div class="demo-compare-sep"></div>
+      <div class="demo-col demo-col-api">
+        <div class="demo-col-label">APIキーあり</div>
+        <div class="demo-col-items">
+          <div class="demo-col-item">あなたの記録から生成</div>
+          <div class="demo-col-item">絵文字×文脈で変わる</div>
+          <div class="demo-col-item">lineageで知識文書を選択</div>
+          <div class="demo-col-item">共鳴がlogに刻まれる</div>
+        </div>
+      </div>
+    </div>
+    <button class="demo-compare-cta" onclick="openApikeyModal(false)">
+      APIキーを設定して、自分の腸から始める →
+    </button>
+  </div>
   <div id="kotobaSection" style="display:none">
     <hr class="kotoba-divider">
     <button class="kotoba-toggle" id="kotobaToggle" onclick="toggleKotoba()">▷ このことばの背景</button>
@@ -840,13 +938,17 @@ function saveApiKey(key) {
 }
 function updateApikeyIndicator() {
   const el = document.getElementById('apikeyIndicator');
-  if (getApiKey()) {
+  const hasKey = !!getApiKey();
+  if (hasKey) {
     el.textContent = 'API key ✓';
     el.classList.add('set');
   } else {
     el.textContent = 'API key —';
     el.classList.remove('set');
   }
+  // Screen 0 のcompareカード：APIキーなし時のみ表示
+  const s0card = document.getElementById('demoCompareS0');
+  if (s0card) s0card.style.display = hasKey ? 'none' : 'block';
 }
 function openApikeyModal(fromDeep) {
   _pendingDeep = !!fromDeep;
@@ -866,6 +968,7 @@ function saveApikeyAndContinue() {
   const val = document.getElementById('apikeyInput').value.trim();
   saveApiKey(val);
   document.getElementById('apikeyOverlay').classList.remove('active');
+  updateApikeyIndicator();
   if (_pendingDeep) { _pendingDeep = false; goDeep(); }
 }
 
@@ -1017,6 +1120,7 @@ async function goDeep() {
     document.getElementById('restartBtn').style.display = 'none';
     document.getElementById('expBadge').style.display = 'none';
     document.getElementById('kotobaSection').style.display = 'none';
+    document.getElementById('demoCompare').style.display = 'none';
     go(4);
 
     if (demo) {
@@ -1047,9 +1151,8 @@ async function goDeep() {
   document.getElementById('restartBtn').style.display = 'none';
   document.getElementById('expBadge').style.display = 'none';
   document.getElementById('kotobaSection').style.display = 'none';
+  document.getElementById('demoCompare').style.display = 'none';
   go(4);
-
-  // 経験文書・知識文書を取得してプロンプトに注入
   const exp = retrieveExperienceDocs();
   const expContext     = buildExpContext(exp);
   const knowContext    = (typeof buildKnowledgeContext === 'function')
@@ -1165,6 +1268,7 @@ function restart() {
   state = { cat: null, emoji: null, choice: null };
   // ことばの種を閉じてリセット
   document.getElementById('kotobaBody').style.display = 'none';
+  document.getElementById('demoCompare').style.display = 'none';
   const toggle = document.getElementById('kotobaToggle');
   toggle.textContent = '▷ このことばの背景';
   toggle.classList.remove('open');
@@ -1174,12 +1278,9 @@ function restart() {
 // ── 体験モードバッジ ──
 function showDemoBadge() {
   const badge = document.getElementById('expBadge');
-  badge.innerHTML =
-    '✦ 体験モード &nbsp;—&nbsp; ' +
-    '<span style="text-decoration:underline;cursor:pointer" onclick="openApikeyModal(false)">' +
-    'APIキーを設定すると、あなたの記録と連動した応答になります' +
-    '</span>';
+  badge.innerHTML = '✦ 体験モード';
   badge.style.display = 'inline-block';
+  document.getElementById('demoCompare').style.display = 'block';
 }
 
 // ── ことばの種 ──
@@ -1293,6 +1394,6 @@ function showKotobanSeed(cat, emojiLabel) {
 // ── Init ──
 updateApikeyIndicator();
 </script>
-<div class="ver-badge">gut-socratic v4.9</div>
+<div class="ver-badge">gut-socratic v5.0</div>
 </body>
 </html>
